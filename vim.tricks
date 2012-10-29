@@ -3,3 +3,8 @@ stuff stuff stuff stuff stuff
 :syntax match stuff ".*stuff.*"
 :hi stuff ctermfg=red
 
+
+Start basn from vim-screen
+:ScreenShell
+
+

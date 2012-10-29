@@ -61,3 +61,5 @@ filetype indent on
 " http://www.lepem.ufc.br/jaa/r-plugin.html#r-plugin-key-bindings
 
 " install vimcom in R: http://www.lepem.ufc.br/jaa/vimcom.html
+
+let g:ScreenImpl='Tmux'

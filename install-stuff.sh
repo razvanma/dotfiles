@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+# Install tmux
+# for v1.6 'tmux -V' should say 'tmux 1.6'
+sudo apt-get install tmux
+
 # Install qgit
 sudo apt-get install qgit
 
