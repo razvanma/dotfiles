@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+# Install qgit
+sudo apt-get install qgit
+
 # Download, compile and install tmux 1.6
 sudo apt-get install libevent-dev
 wget https://launchpad.net/ubuntu/+archive/primary/+files/tmux_1.6.orig.tar.gz

@@ -1,0 +1,5 @@
+Syntax highlighting                                                                                                                                   
+stuff stuff stuff stuff stuff
+:syntax match stuff ".*stuff.*"
+:hi stuff ctermfg=red
+
