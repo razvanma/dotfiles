@@ -28,6 +28,12 @@ sudo make install
 # In R: source("package_installer.R")
 wget https://raw.github.com/johnmyleswhite/ML_for_Hackers/master/package_installer.R
 
+# qnamebuf, search for file by name
+# http://www.vim.org/scripts/script.php?script_id=3217
+cd ~/.vim
+wget -O qnamebuf.zip http://www.vim.org/scripts/script.php?script_id=3217
+unzip qnamebuf.zip
+
 # Upgrade: to vim 7.3
 # HOWTO: http://unix.stackexchange.com/questions/5048/best-way-to-upgrade-vim-gvim-to-7-3-in-ubuntu-10-04
 

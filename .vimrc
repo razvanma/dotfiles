@@ -63,3 +63,8 @@ filetype indent on
 " install vimcom in R: http://www.lepem.ufc.br/jaa/vimcom.html
 
 let g:ScreenImpl='Tmux'
+
+" qnamebuf, search for file by name
+" http://www.vim.org/scripts/script.php?script_id=3217
+nmap ,f :call QNameFileInit("", "", 0)<cr>:~
+
