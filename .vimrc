@@ -55,16 +55,19 @@ syntax enable
 filetype plugin on
 filetype indent on
 
-" install vim screen: http://www.vim.org/scripts/script.php?script_id=2711
-
-" install vim-r-plugin: http://www.vim.org/scripts/script.php?script_id=2628
-" http://www.lepem.ufc.br/jaa/r-plugin.html#r-plugin-key-bindings
-
-" install vimcom in R: http://www.lepem.ufc.br/jaa/vimcom.html
-
 let g:ScreenImpl='Tmux'
 
-" qnamebuf, search for file by name
-" http://www.vim.org/scripts/script.php?script_id=3217
+" qnamebuf
 nmap ,f :call QNameFileInit("", "", 0)<cr>:~
+
+" vimscreen
+map ,s :ScreenSend<CR>
+
+" Plugins:
+"  - vim screen: http://www.vim.org/scripts/script.php?script_id=2711
+"  - vim-r-plugin: http://www.vim.org/scripts/script.php?script_id=2628
+"      http://www.lepem.ufc.br/jaa/r-plugin.html#r-plugin-key-bindings
+"  - vimcom (for Rsh): http://www.lepem.ufc.br/jaa/vimcom.html
+"  - qnamebuf: search for file by name
+"      http://www.vim.org/scripts/script.php?script_id=3217
 
