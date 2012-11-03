@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+# Install config files
+cp ./.vimrc ~/.vimrc
+cp ./.tmux.conf ~/.tmux.conf
+
 # Install tmux
 # for v1.6 'tmux -V' should say 'tmux 1.6'
 sudo apt-get install tmux
