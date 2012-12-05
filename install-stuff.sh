@@ -13,6 +13,7 @@ sudo apt-get install qgit
 
 # qnamebuf, search for file by name
 # README: http://www.vim.org/scripts/script.php?script_id=3217
+mkdir ~/.vim
 pushd ~/.vim
 wget -O qnamebuf.zip http://www.vim.org/scripts/download_script.php?src_id=15680
 unzip ./qnamebuf.zip
