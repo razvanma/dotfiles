@@ -11,6 +11,12 @@ hi diffchange   guibg=#ffffc0   guifg=#000000   gui=none
 hi difftext   guibg=#ffff00   guifg=#000000   gui=none
 hi diffdelete   guibg=#ff0000   guifg=#000000   gui=none
 
+hi diffadd   ctermbg=Yellow   ctermfg=Black   cterm=none
+hi diffchange   ctermbg=Blue   ctermfg=White   cterm=none
+hi difftext   ctermbg=Yellow   ctermfg=Black   cterm=none
+hi diffdelete   ctermbg=Red   ctermfg=Black   cterm=none
+
+
 " Highlight search terms
 set hlsearch
 
