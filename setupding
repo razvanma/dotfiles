@@ -1,0 +1,9 @@
+while :; do
+	if [ -e ./razrazub4/ding ];
+	then
+		#figlet -ct DONE | xmessage -file - &
+		aplay ding.wav;
+		rm ./razrazub4/ding;
+		sleep 1
+	fi;
+done &
