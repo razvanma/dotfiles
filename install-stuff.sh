@@ -11,6 +11,9 @@ sudo apt-get install tmux
 # Install qgit
 sudo apt-get install qgit
 
+# Install sshfs
+sudo apt-get install sshfs
+
 # qnamebuf, search for file by name
 # README: http://www.vim.org/scripts/script.php?script_id=3217
 mkdir ~/.vim

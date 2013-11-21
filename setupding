@@ -3,7 +3,7 @@ while :; do
 	then
 		#figlet -ct DONE | xmessage -file - &
 		aplay ding.wav;
-		rm ./razrazub4/ding;
+		rm ~/ding;
 		sleep 1
 	fi;
 done &
