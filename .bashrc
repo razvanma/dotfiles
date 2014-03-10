@@ -114,3 +114,10 @@ export PAGER="/bin/sh -c \"unset PAGER;col -b -x | \
     vim -R -c 'set ft=man nomod nolist' -c 'map q :q<CR>' \
     -c 'map <SPACE> <C-D>' -c 'map b <C-U>' \
     -c 'nmap K :Man <C-R>=expand(\\\"<cword>\\\")<CR><CR>' -\""
+
+# dot progress  as in: find . | ...
+alias ...="awk '{fflush(); printf \".\"}' && echo \"\""
+
+# prepend output with time, as in find | timeit
+alias timeit='while read line; do echo "[`date -Iseconds`] $line"; done'
+
