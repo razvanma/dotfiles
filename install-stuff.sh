@@ -20,6 +20,9 @@ mkdir ~/.vim
 pushd ~/.vim
 wget -O qnamebuf.zip http://www.vim.org/scripts/download_script.php?src_id=15680
 unzip ./qnamebuf.zip
+
+# syntax highlighting for .Rmd R markdown files
+wget https://raw.github.com/jcfaria/Vim-R-plugin/master/syntax/rmd.vim
 popd
 
 # Install: vimscreen
@@ -46,7 +49,7 @@ vim -c 'so %' -c 'q' screen.vba
 ## Install: ML for hackers packages
 ## Repository: https://github.com/johnmyleswhite/ML_for_Hackers.git
 ## In R: source("package_installer.R")
-wget https://raw.github.com/johnmyleswhite/ML_for_Hackers/master/package_installer.R
+#wget https://raw.github.com/johnmyleswhite/ML_for_Hackers/master/package_installer.R
 
 # Install: colorout plugin for R
 
