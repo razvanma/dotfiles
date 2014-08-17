@@ -30,6 +30,9 @@ popd
 wget -O screen.vba http://www.vim.org/scripts/download_script.php?src_id=16100
 vim -c 'so %' -c 'q' screen.vba
 
+# https://github.com/mooz/percol
+sudo pip install percol
+
 ## Download, compile and install tmux 1.6
 #sudo apt-get install libevent-dev
 #wget https://launchpad.net/ubuntu/+archive/primary/+files/tmux_1.6.orig.tar.gz

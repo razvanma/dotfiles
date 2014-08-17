@@ -77,3 +77,8 @@ map ,s :ScreenSend<CR>
 "  - qnamebuf: search for file by name
 "      http://www.vim.org/scripts/script.php?script_id=3217
 
+" more sane copy/paste in gvim
+nmap <C-V> "+gP
+imap <C-V> <ESC><C-V>i
+vmap <C-C> "+y
+
