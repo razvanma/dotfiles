@@ -135,7 +135,7 @@ bindkey '^r' history-incremental-search-backward
 # vi mode indication + git branch in prompt
 # from http://dougblack.io/words/zsh-vi-mode.html
 function zle-line-init zle-keymap-select {
-  VIM_PROMPT="%{$fg_bold[yellow]%} [% NORMAL]% %{$reset_color%}"
+  VIM_PROMPT="%{$fg_bold[red]%} [% NORMAL]% %{$reset_color%}"
   RPS1="${${KEYMAP/vicmd/$VIM_PROMPT}/(main|viins)/} $EPS1"
   zle reset-prompt
 }
@@ -149,3 +149,11 @@ promptinit
 
 PS1='[%*] %{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%}% %{$reset_color%} %~$ '
 
+# jjv opens the editor
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
+
+# Search backward/forward in command history
+bindkey "^[p" history-beginning-search-backward
+bindkey "^[n" history-beginning-search-forward
