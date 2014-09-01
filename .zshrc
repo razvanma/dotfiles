@@ -157,3 +157,11 @@ bindkey -M vicmd v edit-command-line
 # Search backward/forward in command history
 bindkey "^[p" history-beginning-search-backward
 bindkey "^[n" history-beginning-search-forward
+
+# Output how long a command took if it took > REPORTTIME
+export REPORTTIME=10
+
+# Prompts for confirmation after 'rm *' etc
+# # Helps avoid mistakes like 'rm * o' when 'rm *.o' was intended
+setopt RM_STAR_WAIT
+
