@@ -30,8 +30,12 @@ popd
 wget -O screen.vba http://www.vim.org/scripts/download_script.php?src_id=16100
 vim -c 'so %' -c 'q' screen.vba
 
+# install oh my zsh
+wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
+chsh -s `which zsh`
+
 # https://github.com/mooz/percol
-sudo pip install percol
+#sudo pip install percol
 
 ## Download, compile and install tmux 1.6
 #sudo apt-get install libevent-dev
