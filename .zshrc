@@ -79,6 +79,9 @@ export PATH="/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# git branch, listing branches by last modified time
+alias gbs="git for-each-ref --sort=-committerdate refs/heads/ --format='%(committerdate)%09%09%(refname:short)' | sed 's/refs\/heads\///g'"
+
 ################################################################################################
 setopt histignorealldups sharehistory
 setopt appendhistory autocd extendedglob
@@ -158,10 +161,10 @@ bindkey -M vicmd v edit-command-line
 bindkey "^[p" history-beginning-search-backward
 bindkey "^[n" history-beginning-search-forward
 
-# Output how long a command took if it took > REPORTTIME
-export REPORTTIME=10
+# vig opens all edited files in vim
+gdf() { git diff --stat --name-only $(git5 status --base) | xargs -I {} echo "$(git rev-parse --show-toplevel)/{}"}
+alias vig='vi $(gdf)'
 
-# Prompts for confirmation after 'rm *' etc
-# # Helps avoid mistakes like 'rm * o' when 'rm *.o' was intended
-setopt RM_STAR_WAIT
-
+# color stderr in red
+exec 2>>( while read X; do print "\e[91m${X}\e[0m" > /dev/tty; done & )
+#exec 2>&1
