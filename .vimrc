@@ -69,6 +69,9 @@ nmap ,f :call QNameFileInit("", "", 0)<cr>:~
 " vimscreen
 map ,s :ScreenSend<CR>
 
+map <F2> :cp<ENTER>
+map <F3> :cn<ENTER>
+
 " Plugins:
 "  - vim screen: http://www.vim.org/scripts/script.php?script_id=2711
 "  - vim-r-plugin: http://www.vim.org/scripts/script.php?script_id=2628
@@ -82,3 +85,5 @@ nmap <C-V> "+gP
 imap <C-V> <ESC><C-V>i
 vmap <C-C> "+y
 
+" tab autocompletion menu
+set wildchar=<Tab> wildmenu wildmode=full
