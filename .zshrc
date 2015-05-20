@@ -169,9 +169,30 @@ bindkey "^[n" history-beginning-search-forward
 gdf() { git diff --stat --name-only $(git5 status --base) | xargs -I {} echo "$(git rev-parse --show-toplevel)/{}"}
 alias vig='vi $(gdf)'
 
+# Output how long a command took if it took > REPORTTIME
+export REPORTTIME=10
+
+# Prompts for confirmation after 'rm *' etc
+# # Helps avoid mistakes like 'rm * o' when 'rm *.o' was intended
+setopt RM_STAR_WAIT
+
 # color stderr in red
 exec 2>>( while read X; do print "\e[91m${X}\e[0m" > /dev/tty; done & )
 #exec 2>&1
 
 # Sets up a prompt that touches the ding file (on the remote machine)
 setupding() { PS1='$(touch /usr/local/google/git/ding)$' }
+
+# Sets up the ding sound on the local machine
+dingssh() {
+  sshfs sshfs raz-linux.kir:/usr/local/google/git ~/raz-linux.kir
+}
+
+dinger() {
+  while :; do                                                                                                                                                                                  
+    if [ -e ./raz-linux.kir/ding ]; then
+        aplay ding.wav; rm ./raz-linux.kir/ding
+    fi;
+    sleep 2;
+  done
+}
