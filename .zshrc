@@ -150,7 +150,11 @@ zle -N zle-keymap-select
 autoload -Uz promptinit
 promptinit
 
-PS1='[%*] %{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%}% %{$reset_color%} %~$ '
+# With path
+#PS1='[%*] %{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%}% %{$reset_color%} %~$ '
+
+# Without path
+PS1='[%*] %{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%}% %{$reset_color%} ~$ '
 
 # jjv opens the editor
 autoload -U edit-command-line
@@ -168,3 +172,6 @@ alias vig='vi $(gdf)'
 # color stderr in red
 exec 2>>( while read X; do print "\e[91m${X}\e[0m" > /dev/tty; done & )
 #exec 2>&1
+
+# Sets up a prompt that touches the ding file (on the remote machine)
+setupding() { PS1='$(touch /usr/local/google/git/ding)$' }
