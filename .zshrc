@@ -180,15 +180,16 @@ setopt RM_STAR_WAIT
 exec 2>>( while read X; do print "\e[91m${X}\e[0m" > /dev/tty; done & )
 #exec 2>&1
 
-# Sets up a prompt that touches the ding file (on the remote machine)
-setupding() { PS1='$(touch /usr/local/google/git/ding)$' }
-
-# Sets up the ding sound on the local machine
-dingssh() {
+mountdevbox() {
   sshfs sshfs raz-linux.kir:/usr/local/google/git ~/raz-linux.kir
 }
 
-dinger() {
+# Sets up a prompt that touches the ding file (on the remote machine)
+ding() { 'touch /usr/local/google/git/ding)$' }
+dingprompt() { PS1='$(touch /usr/local/google/git/ding)$' }
+
+# Sets up the ding sound on the local machine
+dingserver() {
   while :; do                                                                                                                                                                                  
     if [ -e ./raz-linux.kir/ding ]; then
         aplay ding.wav; rm ./raz-linux.kir/ding
