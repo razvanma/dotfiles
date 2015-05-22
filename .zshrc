@@ -185,7 +185,7 @@ mountdevbox() {
 }
 
 # Sets up a prompt that touches the ding file (on the remote machine)
-ding() { 'touch /usr/local/google/git/ding)$' }
+ding() { touch /usr/local/google/git/ding }
 dingprompt() { PS1='$(touch /usr/local/google/git/ding)$' }
 
 # Sets up the ding sound on the local machine
