@@ -197,3 +197,6 @@ dingserver() {
     sleep 2;
   done
 }
+
+# Diff with git5
+alias g5d='git difftool --dir-diff -t=meld $(git5 status --base)'
