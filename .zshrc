@@ -154,7 +154,7 @@ promptinit
 #PS1='[%*] %{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%}% %{$reset_color%} %~$ '
 
 # Without path
-PS1='[%*] %{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%}% %{$reset_color%} ~$ '
+PS1='[%*] %{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%}% %{$reset_color%}%2/ $ '
 
 # jjv opens the editor
 autoload -U edit-command-line
@@ -200,3 +200,5 @@ dingserver() {
 
 # Diff with git5
 alias g5d='git difftool --dir-diff -t=meld $(git5 status --base)'
+
+alias ack=ack-grep

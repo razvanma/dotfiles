@@ -14,6 +14,24 @@ sudo apt-get install qgit
 # Install sshfs
 sudo apt-get install sshfs
 
+# 256-color terminal (https://push.cx/2008/256-color-xterms-in-ubuntu)
+#
+# Xterm needs a little more configuration, edit ~/.Xdefaults to add:
+#
+#*customization: -color
+#XTerm*termName:  xterm-256color
+#
+#To make this apply to new terminals (so you don’t have to log out and back in), run:
+#  xrdb -merge ~/.Xdefaults
+#
+# In screen, set:
+# TERM=xterm-256color
+#
+sudo aptitude install ncurses-term
+
+# Install ack-grep package
+sudo apt-get install ack-grep
+
 # qnamebuf, search for file by name
 # README: http://www.vim.org/scripts/script.php?script_id=3217
 mkdir ~/.vim
