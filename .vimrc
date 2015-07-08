@@ -87,3 +87,6 @@ vmap <C-C> "+y
 
 " tab autocompletion menu
 set wildchar=<Tab> wildmenu wildmode=full
+
+" 256-color vi
+colorscheme desert256v2

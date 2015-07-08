@@ -177,7 +177,7 @@ export REPORTTIME=10
 setopt RM_STAR_WAIT
 
 # color stderr in red
-exec 2>>( while read X; do print "\e[91m${X}\e[0m" > /dev/tty; done & )
+#exec 2>>( while read X; do print "\e[91m${X}\e[0m" > /dev/tty; done & )
 #exec 2>&1
 
 mountdevbox() {
@@ -202,3 +202,12 @@ dingserver() {
 alias g5d='git difftool --dir-diff -t=meld $(git5 status --base)'
 
 alias ack=ack-grep
+
+# Some git overrides
+alias gdt='git difftool --dir-diff -t=meld'
+
+# Have history pretty-print timestamps
+history() { perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localtime $1,$2' $HISTFILE } 
+
+# Force a 256-color xterm
+TERM=xterm-256color
