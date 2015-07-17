@@ -58,6 +58,17 @@ endfunction
 " from R plugin installation: http://www.lepem.ufc.br/jaa/r-plugin.html#r-plugin-installation
 set nocompatible
 syntax enable
+
+" For vundle package manager
+" Vundle was installed by: git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+" call :PluginInstall or PlugginUpdate to trigger an install of all packages
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'gmarik/Vundle.vim'
+Bundle 'jlanzarotta/bufexplorer'
+call vundle#end()
+
 filetype plugin on
 filetype indent on
 
@@ -90,3 +101,19 @@ set wildchar=<Tab> wildmenu wildmode=full
 
 " 256-color vi
 colorscheme desert256v2
+
+source /usr/share/vim/google/google.vim
+Glug youcompleteme-google
+
+" Debugging ycm:
+" :let g:ycm_server_use_vim_stdout = 1
+" :let g:ycm_server_log_level = 'debug'
+" :messages
+
+" After touching a proto file:
+" :YcmRestartServer
+
+" Do not highlight tabs in text files.
+:autocmd BufRead,BufNewFile *.txt set sw=8 ts=8 noexpandtab nolist
+
+filetype plugin indent on
