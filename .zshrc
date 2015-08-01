@@ -167,8 +167,8 @@ bindkey "^[n" history-beginning-search-forward
 
 # vig opens all edited files in vim
 gdf() { git diff --stat --name-only $(git5 status --base) | xargs -I {} echo "$(git rev-parse --show-toplevel)/{}"}
-alias vig='vi $(gdf)'
-alias vigl='vi $(gdf | grep $(pwd))'
+alias vig='vi $(gdf) -c ":BufExplorer"'
+alias vigl='vi $(gdf | grep $(pwd)) -c ":BufExplorer"'
 
 # Output how long a command took if it took > REPORTTIME
 export REPORTTIME=10
@@ -214,7 +214,7 @@ history() { perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localti
 TERM=xterm-256color
 
 # Fast paths
-alias cdg3='cd /usr/local/google/git/google3'
+alias g3='cd /usr/local/google/git/google3'
 alias cdstorelf='cd /usr/local/google/git/google3/wireless/android/play/logflow/store'
 alias cdsearchlf='cd /usr/local/google/git/google3/wireless/android/play/logflow/search'
 alias cdfinsky='cd /usr/local/google/git/google3/wireless/android/finsky/stats/proto'
