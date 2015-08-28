@@ -213,6 +213,9 @@ history() { perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localti
 # Force a 256-color xterm
 TERM=xterm-256color
 
+# Do not kill background jobs on exit.
+setopt NO_HUP
+
 # Fast paths
 alias g3='cd /usr/local/google/git/google3'
 alias cdstorelf='cd /usr/local/google/git/google3/wireless/android/play/logflow/store'
