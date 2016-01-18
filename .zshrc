@@ -218,8 +218,8 @@ setopt NO_HUP
 
 # Fast paths
 alias g3='cd /usr/local/google/git/google3'
-alias cdstorelf='cd /usr/local/google/git/google3/wireless/android/play/logflow/store'
-alias cdsearchlf='cd /usr/local/google/git/google3/wireless/android/play/logflow/search'
-alias cdfinsky='cd /usr/local/google/git/google3/wireless/android/finsky/stats/proto'
-alias cdlsd='cd /usr/local/google/git/google3/wireless/android/play/analytics/apps/lsd'
+alias cdstore='cd /usr/local/google/git/google3/wireless/android/play/logflow/store'
+alias cdapps='cd /usr/local/google/git/google3/wireless/android/play/logflow/apps'
+alias cdctr='cd /usr/local/google/git/google3/wireless/android/play/logflow/ctr'
 
+bindkey '^R' history-incremental-pattern-search-backward
