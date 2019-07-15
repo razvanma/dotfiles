@@ -208,7 +208,7 @@ alias ack=ack-grep
 alias gdt='git difftool --dir-diff -t=meld'
 
 # Have history pretty-print timestamps
-history() { perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localtime $1,$2' $HISTFILE }
+#history() { perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localtime $1,$2' $HISTFILE }
 
 # Force a 256-color xterm
 TERM=xterm-256color

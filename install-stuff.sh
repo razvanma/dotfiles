@@ -27,6 +27,7 @@ sudo apt-get install sshfs
 # In screen, set:
 # TERM=xterm-256color
 #
+sudo apt-get install aptitude
 sudo aptitude install ncurses-term
 
 # Install ack-grep package
@@ -34,13 +35,13 @@ sudo apt-get install ack-grep
 
 # qnamebuf, search for file by name
 # README: http://www.vim.org/scripts/script.php?script_id=3217
-mkdir ~/.vim
+mkdir -p ~/.vim
 pushd ~/.vim
 wget -O qnamebuf.zip http://www.vim.org/scripts/download_script.php?src_id=15680
 unzip ./qnamebuf.zip
 
 # syntax highlighting for .Rmd R markdown files
-wget https://raw.github.com/jcfaria/Vim-R-plugin/master/syntax/rmd.vim
+# wget https://raw.githubusercontent.com/jcfaria/Vim-R-plugin/master/syntax/rmd.vim
 popd
 
 # Install: vimscreen
@@ -51,6 +52,15 @@ vim -c 'so %' -c 'q' screen.vba
 # install oh my zsh
 wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
 chsh -s `which zsh`
+
+# install vundle under ~/.vim
+git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+# install vim themes
+git clone https://github.com/flazz/vim-colorschemes.git temp
+mkdir -p ~/.vim/colors
+cp temp/colors/* ~/.vim/colors
+rm -rf temp
 
 # Trigger installer for all vim vundle packages.
 vim +PluginInstall +qall
