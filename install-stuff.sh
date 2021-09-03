@@ -1,5 +1,12 @@
 #!/bin/bash -e
 
+# files:
+# ~/.xinitrc
+# ~/.Xresources
+
+# pacman -S sf86-input-synaptics
+# ~/usr/share/X11/xorg.conf.d/70-synaptics.conf
+
 # Install config files
 cp ./.vimrc ~/.vimrc
 cp ./.tmux.conf ~/.tmux.conf
@@ -64,4 +71,3 @@ rm -rf temp
 
 # Trigger installer for all vim vundle packages.
 vim +PluginInstall +qall
-

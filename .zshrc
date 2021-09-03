@@ -223,3 +223,7 @@ alias cdapps='cd /usr/local/google/git/google3/wireless/android/play/logflow/app
 alias cdctr='cd /usr/local/google/git/google3/wireless/android/play/logflow/ctr'
 
 bindkey '^R' history-incremental-pattern-search-backward
+
+# Lookup in cmdfu
+cmdfu(){ curl "http://www.commandlinefu.com/commands/matching/$@/$(echo -n $@ | openssl base64)/plaintext"; }
+

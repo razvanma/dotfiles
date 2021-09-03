@@ -1,0 +1,46 @@
+# Network management
+pacman -Sy netctl 
+pacman -Sy dialog dhcpd wpa_supplicant ifplugd
+pacman -Sy dialog dhcpcd wpa_supplicant ifplugd
+
+# Boot loader / GRUB
+pacman -S os-prober
+pacman -S grub efibootmgr
+
+# Basics
+pacman -S pacman-contrib
+pacman -Sy vim
+pacman -S vi-vim-symlink
+pacman -S --needed base-devel git
+pacman -S --needed sudo
+
+# X-windows
+pacman -S xorg
+pacman -S xinit
+pacman -Ss xf86-video
+pacman -S xorg-xinit
+# not sure: pacman -Qkk haskell-utf8-string
+pacman -S xmonad xmonad-contrib
+pacman -S xterm xorg-xclock
+
+# Graphics
+pacman -S nvidia
+pacman -S glxinfo
+pacman -S mesa mesa-demos
+
+# sound card install
+sudo pacman -S pulseaudio
+sudo pacman -S pulseaudio-alsa
+sudo pacman -S pulseaudio-equalizer
+sudo pacman -S pacmixer
+sudo pacman -S alsa-card-profile
+
+# sound card --https://unix.stackexchange.com/questions/633019/arch-linux-doesnt-recognize-sound-driver-dummy-output
+pacmd list-cards
+pacmd set-card-profile 0 output:hdmi-stereo
+sudo touch /etc/modprobe.d/audio-fix.conf  
+sudo echo "blacklist snd-sof-pci" > /etc/modprobe.d/audio-fix.conf 
+sudo echo "options snd-intel-dspcfg dsp_driver=1" >> /etc/modprobe.d/audio-fix.conf 
+
+# volume control
+alsamixer
