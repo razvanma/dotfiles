@@ -50,10 +50,10 @@ map <C-L> <C-W>l<C-W>_
 set cursorline
 
 " svn blame
-function SvnBlame()
-  silent !svn blame % > ~/svnblame.txt
-  sp ~/svnblame.txt
-endfunction
+"function SvnBlame()
+"  silent !svn blame % > ~/svnblame.txt
+"  sp ~/svnblame.txt
+"endfunction
 
 " from R plugin installation: http://www.lepem.ufc.br/jaa/r-plugin.html#r-plugin-installation
 set nocompatible
@@ -62,12 +62,12 @@ syntax enable
 " For vundle package manager
 " Vundle was installed by: git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 " call :PluginInstall or PlugginUpdate to trigger an install of all packages
-filetype off
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin 'gmarik/Vundle.vim'
-Bundle 'jlanzarotta/bufexplorer'
-call vundle#end()
+"filetype off
+"set rtp+=~/.vim/bundle/Vundle.vim
+"call vundle#begin()
+"Plugin 'gmarik/Vundle.vim'
+"Bundle 'jlanzarotta/bufexplorer'
+"call vundle#end()
 
 filetype plugin on
 filetype indent on
@@ -102,8 +102,8 @@ set wildchar=<Tab> wildmenu wildmode=full
 " 256-color vi
 colorscheme desert256v2
 
-source /usr/share/vim/google/google.vim
-Glug youcompleteme-google
+"source /usr/share/vim/google/google.vim
+"Glug youcompleteme-google
 
 " Debugging ycm:
 " :let g:ycm_server_use_vim_stdout = 1

@@ -3,3 +3,5 @@ XTerm*termName:  xterm-256color
 xterm*font:     *-fixed-*-*-*-18-*
 XTerm*faceName: Luxi Mono
 XTerm*faceSize: 12
+XTerm*background: black
+XTerm*foreground: lightgray
