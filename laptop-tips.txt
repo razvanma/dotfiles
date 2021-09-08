@@ -57,6 +57,10 @@ yay -S nvidia-docker-toolkit
 sudo groupadd docker
 sudo usermod -aG docker $USER
 newgrp docker
+docker -v
 
 # Test out GPU in docker
-docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl nvidia/cuda:11.3.0-runtime-ubuntu20.04 nvidia-smi
+sudo docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl nvidia/cuda:11.3.0-runtime-ubuntu20.04 nvidia-smi
+
+sudo docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl -it --rm tensorflow/tensorflow \
+   python -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
