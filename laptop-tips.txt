@@ -48,3 +48,15 @@ alsamixer
 # Touchpad - use 'synclient -l' to see and play with settings
 sudo pacman -S xf86-input-synaptics
 
+# Docker
+sudo pacman -S docker
+sudo systemctl start docker.socket
+yay -S nvidia-docker-toolkit
+
+# Docker - avoiding sudo
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Test out GPU in docker
+docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl nvidia/cuda:11.3.0-runtime-ubuntu20.04 nvidia-smi
