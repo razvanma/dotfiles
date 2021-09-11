@@ -60,7 +60,21 @@ newgrp docker
 docker -v
 
 # Test out GPU in docker
-sudo docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl nvidia/cuda:11.3.0-runtime-ubuntu20.04 nvidia-smi
+nvidia-modprobe -u -c=0
+docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl nvidia/cuda:11.3.0-runtime-ubuntu20.04 nvidia-smi
 
-# Tensorflow with GPU (run python, import tensorflow as tf, print tf.list_physical_devices()
-sudo docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl -it tensorflow/tensorflow:latest-gpu bash
+# Tensorflow with GPU (run python, import tensorflow as tf, print tf.config.list_physical_devices()
+# Must not run as sudo to pick up the nvidia-docker-toolkit
+# restart exited container after rebooting host OS:https://github.com/NVIDIA/nvidia-docker/issues/288 
+docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl -it tensorflow/tensorflow:latest-gpu bash
+
+# Google cloud container with Jupyter and tensorflow
+# from
+docker run -d -p 8080:8080 -v `pwd`:/home --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl -it gcr.io/deeplearning-platform-release/tf2-gpu.2-6
+
+# Simple examples at https://github.com/tensorflow/examples/tree/master/courses/udacity_deep_learning 
+
+# docker ps and docker attach are useful for jumping into the running container
+
+# docker / tf: https://www.youtube.com/watch?v=eY7znLC9PDw#
+
