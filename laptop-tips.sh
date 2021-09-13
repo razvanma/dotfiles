@@ -59,14 +59,18 @@ sudo usermod -aG docker $USER
 newgrp docker
 docker -v
 
-# Test out GPU in docker
+# start docker and the nvdia drivera
+systemctl start docker.socket
 nvidia-modprobe -u -c=0
+
+# Test out GPU in docker
 docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl nvidia/cuda:11.3.0-runtime-ubuntu20.04 nvidia-smi
 
-# Tensorflow with GPU (run python, import tensorflow as tf, print tf.config.list_physical_devices()
-# Must not run as sudo to pick up the nvidia-docker-toolkit
-# restart exited container after rebooting host OS:https://github.com/NVIDIA/nvidia-docker/issues/288 
-docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl -it tensorflow/tensorflow:latest-gpu bash
+# Tensorflow with GPU 
+# Do NOT run as sudo, so that nvidia-docker-toolkit can be found
+# restart exited container after rebooting host OS:
+# https://github.com/NVIDIA/nvidia-docker/issues/288 
+docker run --gpus all --device /dev/nvidia0 --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidiactl -it tensorflow/tensorflow:latest-gpu python -c 'import tensorflow as tf; print(tf.config.list_physical_devices("GPU"))'
 
 # Google cloud container with Jupyter and tensorflow
 # from
