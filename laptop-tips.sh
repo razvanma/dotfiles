@@ -59,6 +59,9 @@ sudo usermod -aG docker $USER
 newgrp docker
 docker -v
 
+# Install meld for visual git diffs
+sudoe pacman -S meld
+
 # start docker and the nvdia drivera
 systemctl start docker.socket
 nvidia-modprobe -u -c=0

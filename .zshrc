@@ -205,7 +205,7 @@ alias g5d='git difftool --dir-diff -t=meld $(git5 status --base)'
 alias ack=ack-grep
 
 # Some git overrides
-alias gdt='git difftool --dir-diff -t=meld'
+alias gdt='git difftool --dir-diff -t meld'
 
 # Have history pretty-print timestamps
 #history() { perl -lne 'm#: (\d+):\d+;(.+)# && printf "%s :: %s\n",scalar localtime $1,$2' $HISTFILE }
