@@ -1,4 +1,6 @@
-# See https://medium.com/@t.j.titcombe/reinforcement-learning-with-docker-789aa556504b
+# See: https://medium.com/@t.j.titcombe/reinforcement-learning-with-docker-789aa556504b
+# And: https://github.com/TTitcombe/docker_openai_gym
+
 # Use python3.7
 # See https://docs.docker.com/samples/library/python/ for latest 
 FROM python:3.7
