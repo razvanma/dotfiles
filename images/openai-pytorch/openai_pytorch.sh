@@ -8,4 +8,4 @@
    --device /dev/nvidiactl \
    -e DISPLAY=unix$DISPLAY \
    --net=host \
-    -it openai_pytorch
+   -it openai_pytorch

@@ -50,6 +50,7 @@ RUN /root/miniconda3/bin/conda install -y pytorch torchvision torchaudio cudatoo
 # Copy over the start-up script and test file
 ADD scripts/startup_script.sh /usr/local/bin/startup_script.sh
 ADD scripts/test.py /home/test.py
+ADD scripts/mario.py /home/mario.py
 
 # Give permissions to execute
 RUN chmod 777 /usr/local/bin/startup_script.sh
