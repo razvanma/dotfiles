@@ -5,7 +5,9 @@ if [ $# -eq 0 ]
   then
     echo 'cuda.is_available():'
     python -c "import torch; print(torch.cuda.is_available())"
-    echo Run: python test.py and look in tmpFolder for the mp4
+    echo Run: python test.py 
+    echo RUN: export DISPLAY=unix:0
+    echo Run: ffplay tmpFolder/*.mp4
     /bin/bash
 else
   $1

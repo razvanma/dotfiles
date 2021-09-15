@@ -1,8 +1,9 @@
-docker build -t openai_torch .
+# docker build -t openai_torch .
 
 docker run \
-   -e DISPLAY=$DISPLAY \
+   --rm \
    -v /tmp/.X11-unix:/tmp/.X11-unix \
+   -v ~/docker-user/:/home/user:rw \
    --gpus all \
    --device /dev/nvidia0 \
    --device /dev/nvidia-uvm \
