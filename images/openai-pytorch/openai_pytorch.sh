@@ -1,4 +1,6 @@
- docker run \
+docker build -t openai_torch .
+
+docker run \
    -e DISPLAY=$DISPLAY \
    -v /tmp/.X11-unix:/tmp/.X11-unix \
    --gpus all \
