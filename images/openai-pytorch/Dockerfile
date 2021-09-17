@@ -42,7 +42,7 @@ RUN Xvfb :1 -screen 0 1024x768x24 -ac +extension GLX +render -noreset &> xvfb.lo
 RUN export DISPLAY=:1
 
 # Note cuda tools will also be installed here.
-RUN /root/miniconda3/bin/conda install -y pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
+RUN /root/miniconda3/bin/conda install -y pytorch torchvision torchaudio cudatoolkit=11.1 -c pytorch -c conda-forge
 
 # Copy over the start-up script and test file
 ADD scripts/startup_script.sh /usr/local/bin/startup_script.sh
