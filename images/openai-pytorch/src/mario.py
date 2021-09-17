@@ -1,3 +1,10 @@
+import sys
+import code
+
+# colorize Python's exception text
+from IPython.core import ultratb
+sys.excepthook = ultratb.FormattedTB(mode='Verbose', color_scheme='Linux', call_pdb=False)
+
 import time
 from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
@@ -13,9 +20,10 @@ for step in range(5000):
 
     # Facilitates reasonable x11 viz
     # Make sure to first run 'export DISPLAY=unix:0'
-    time.sleep(0.01)
+    time.sleep(0.05)
 
     state, reward, done, info = env.step(env.action_space.sample())
     env.render()
+    # code.interact(local=locals())
 
 env.close()
