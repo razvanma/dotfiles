@@ -21,9 +21,6 @@ RUN apt-get update \
        vim \
        cmake 
 
-# Create a directory in which we can do our work
-#RUN mkdir /home/
-
 # Set it as the working directory
 WORKDIR /home/
 
@@ -49,11 +46,13 @@ RUN /root/miniconda3/bin/conda install -y pytorch torchvision torchaudio cudatoo
 
 # Copy over the start-up script and test file
 ADD scripts/startup_script.sh /usr/local/bin/startup_script.sh
-ADD scripts/test.py /home/test.py
-ADD scripts/mario.py /home/mario.py
 
 # Give permissions to execute
 RUN chmod 777 /usr/local/bin/startup_script.sh
+
+# Create a directory in which we can do our work
+RUN mkdir /home/src/
+WORKDIR /home/src/
 
 # Set the display when we run the container. This allows us to record without the user needing to type anything explicitly
 # This code snippet was taken from https://github.com/duckietown/gym-duckietown/issues/123

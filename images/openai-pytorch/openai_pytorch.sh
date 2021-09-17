@@ -4,7 +4,7 @@ xhost +local:127.0.0.1
 docker run \
    --rm \
    -v /tmp/.X11-unix:/tmp/.X11-unix \
-   -v ~/docker-user/:/home/user:rw \
+   -v `pwd`/src/:/home/src:rw \
    --gpus all \
    --device /dev/nvidia0 \
    --device /dev/nvidia-uvm \
