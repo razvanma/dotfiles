@@ -1,5 +1,6 @@
-# docker build -t openai_torch .
+xhost +local:127.0.0.1
 
+# docker build -t openai_torch .
 docker run \
    --rm \
    -v /tmp/.X11-unix:/tmp/.X11-unix \
