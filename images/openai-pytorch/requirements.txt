@@ -8,4 +8,5 @@ pandas
 PyOpenGL
 PyOpenGL_accelerate
 pyglet
+pynput
 ipython
