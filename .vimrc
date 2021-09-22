@@ -117,3 +117,4 @@ colorscheme desert256v2
 :autocmd BufRead,BufNewFile *.txt set sw=8 ts=8 noexpandtab nolist
 
 filetype plugin indent on
+set visualbell

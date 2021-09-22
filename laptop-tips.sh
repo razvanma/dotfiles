@@ -42,6 +42,11 @@ sudo touch /etc/modprobe.d/audio-fix.conf
 sudo echo "blacklist snd-sof-pci" > /etc/modprobe.d/audio-fix.conf 
 sudo echo "options snd-intel-dspcfg dsp_driver=1" >> /etc/modprobe.d/audio-fix.conf 
 
+# Turn off pc speaker dings
+rmmod pcspkr
+# or in /etc/modprobe.d/blacklist.conf, add "blacklist pcspkr"
+# in vim, :set visualbell
+
 # Volume Control
 alsamixer
 

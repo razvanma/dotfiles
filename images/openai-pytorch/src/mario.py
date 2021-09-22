@@ -1,5 +1,4 @@
 import code
-import numpy as np
 import sys
 import time
 from pynput.keyboard import Key, Listener
@@ -12,8 +11,10 @@ from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 
-env = gym_super_mario_bros.make('SuperMarioBros-v0')
-env = JoypadSpace(env, SIMPLE_MOVEMENT)
+import numpy as np
+import torch.nn as nn
+from torch.nn import Conv2d, BatchNorm2d, ReLU, MaxPool2d, Sequential, Linear
+from torch.distributions.categorical import Categorical
 
 # Allows breaking into the interpreter on the delete key
 pause = False
@@ -47,25 +48,66 @@ class ExperienceBuffer:
         self.ptr += 1
 
 
+class ConvNet(nn.Module):
+    def __init__(self, action_space, obs_space):
+        super(ConvNet, self).__init__()
+
+        final_output_channels = 24
+        stride = 2
+        num_conv_layers = 2
+        self.cnn_layers = nn.Sequential(
+            # Keep in mind:
+            #  - input channels
+            #  - output channels = number of features
+            #  - kernel_size = image feature size
+            Conv2d(obs_space.shape[2], 6, kernel_size=6, stride=1, padding=1),
+            BatchNorm2d(6),
+            ReLU(inplace=True),
+            MaxPool2d(kernel_size=3, stride=stride),
+
+            # Another layer
+            Conv2d(6, final_output_channels, kernel_size=6, stride=1, padding=1),
+            BatchNorm2d(final_output_channels),
+            ReLU(inplace=True),
+            MaxPool2d(kernel_size=3, stride=stride),
+        )
+
+        h = obs_space.shape[0]
+        w = obs_space.shape[1]
+        self.linear_layers = Sequential(Linear(
+            int(final_output_channels * h/stride/num_conv_layers * h/stride/num_conv_layers),
+            action_space.n))
+
+    # Defining the forward pass    
+    def forward(self, x):
+        x = self.cnn_layers(x)
+        x = x.view(x.size(0), -1)
+        x = self.linear_layers(x)
+        return x
+
+
 epochs = 50
 steps = 5000
-done = True
 exp_buf = None
 
+env = gym_super_mario_bros.make('SuperMarioBros-v0')
+env = JoypadSpace(env, SIMPLE_MOVEMENT)
+state = env.reset()
+exp_buf = ExperienceBuffer(state.shape,
+                           (env.action_space.n),
+                           steps)
+
+# Define our policy network
+pi = ConvNet(env.action_space, env.observation_space)
+
+done = False
 with Listener(on_press=go_interactive) as listener:
     for step in range(steps):
-        if done:
-            state = env.reset()
-
+        # Advance the game one step
         action = env.action_space.sample()
         state, reward, done, info = env.step(action)
 
-        # Initialize our experience buffer
-        if not exp_buf:
-            exp_buf = ExperienceBuffer(
-                    state.shape,
-                    (env.action_space.n),
-                    steps)
+        # Record the effect of taking our action
         exp_buf.record(state, action)
 
         # Facilitates reasonable x11 viz
