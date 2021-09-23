@@ -60,14 +60,14 @@ class ConvNet(nn.Module):
             #  - input channels
             #  - output channels = number of features
             #  - kernel_size = image feature size
-            Conv2d(obs_space.shape[2], kernel_size=5, stride=1, padding=2),
+            Conv2d(obs_space.shape[2], 6, kernel_size=5, stride=1, padding=2),
             BatchNorm2d(6),
             ReLU(inplace=True),
             MaxPool2d(kernel_size=3, stride=stride, padding=1),
 
             # Another layer
             Conv2d(6, conv_output_channels, kernel_size=5, stride=1, padding=2),
-            BatchNorm2d(final_output_channels),
+            BatchNorm2d(conv_output_channels),
             ReLU(inplace=True),
             MaxPool2d(kernel_size=3, stride=stride, padding=1),
         )
