@@ -12,6 +12,7 @@ import gym_super_mario_bros
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 
 import numpy as np
+import torch
 import torch.nn as nn
 from torch.nn import Conv2d, BatchNorm2d, ReLU, MaxPool2d, Sequential, Linear
 from torch.distributions.categorical import Categorical
@@ -104,8 +105,21 @@ pi = ConvNet(env.action_space, env.observation_space)
 done = False
 with Listener(on_press=go_interactive) as listener:
     for step in range(steps):
-        # Advance the game one step
-        action = env.action_space.sample()
+        # Note that torch doesn't support negative numpy strides
+        # Also, we need the inputs to be floats, not Bytes
+        state_tensor = torch.from_numpy(np.ascontiguousarray(state)).float()
+
+        # The first dimension must be a batch dimension, create it now.
+        state_tensor = state_tensor.unsqueeze(0)
+
+        # The observations are now in NHWC, but we need them in NCHW
+        state_tensor = state_tensor.permute(0, 3, 1, 2)
+
+        #code.interact(local=locals()); 
+        with torch.no_grad():
+            pi_logits = pi(state_tensor)
+            action = Categorical(logits=pi_logits).sample().item()
+
         state, reward, done, info = env.step(action)
 
         # Record the effect of taking our action
