@@ -97,7 +97,7 @@ class ConvNet(nn.Module):
         w = 28
         outputs = 10
 
-        final_output_channels = 24
+        conv_output_channels = 24
         stride = 2
         num_conv_layers = 2
         self.cnn_layers = nn.Sequential(
@@ -105,21 +105,20 @@ class ConvNet(nn.Module):
             #  - input channels
             #  - output channels = number of features
             #  - kernel_size = image feature size
-            Conv2d(1, 6, kernel_size=6, stride=1, padding=1),
+            Conv2d(1, 6, kernel_size=5, stride=1, padding=2),
             BatchNorm2d(6),
             ReLU(inplace=True),
-            MaxPool2d(kernel_size=3, stride=stride),
+            MaxPool2d(kernel_size=3, stride=stride, padding=1),
 
             # Another layer
-            Conv2d(6, final_output_channels, kernel_size=6, stride=1, padding=1),
-            BatchNorm2d(final_output_channels),
+            Conv2d(6, conv_output_channels, kernel_size=5, stride=1, padding=2),
+            BatchNorm2d(conv_output_channels),
             ReLU(inplace=True),
-            MaxPool2d(kernel_size=3, stride=stride),
+            MaxPool2d(kernel_size=3, stride=stride, padding=1),
         )
 
         self.linear_layers = Sequential(Linear(
-            #int(final_output_channels * h/stride/num_conv_layers * w/stride/num_conv_layers),
-            final_output_channels * 4 * 4,
+            int(conv_output_channels * h/stride/num_conv_layers * w/stride/num_conv_layers),
             outputs))
 
     # Defining the forward pass    
