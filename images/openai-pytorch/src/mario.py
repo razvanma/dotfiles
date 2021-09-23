@@ -75,7 +75,7 @@ class ConvNet(nn.Module):
         h = obs_space.shape[0]
         w = obs_space.shape[1]
         self.linear_layers = Sequential(Linear(
-            int(final_output_channels * h/stride/num_conv_layers * h/stride/num_conv_layers),
+            int(final_output_channels * h/stride/num_conv_layers * w/stride/num_conv_layers),
             action_space.n))
 
     # Defining the forward pass    
