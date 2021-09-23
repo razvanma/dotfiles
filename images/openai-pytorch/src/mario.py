@@ -60,6 +60,7 @@ class ConvNet(nn.Module):
             #  - input channels
             #  - output channels = number of features
             #  - kernel_size = image feature size
+            #  - stride in combination with padding sizes
             Conv2d(obs_space.shape[2], 6, kernel_size=5, stride=1, padding=2),
             BatchNorm2d(6),
             ReLU(inplace=True),

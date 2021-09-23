@@ -97,7 +97,7 @@ class ConvNet(nn.Module):
         w = 28
         outputs = 10
 
-        conv_output_channels = 24
+        conv_output_channels = 128
         stride = 2
         num_conv_layers = 2
         self.cnn_layers = nn.Sequential(
@@ -105,21 +105,24 @@ class ConvNet(nn.Module):
             #  - input channels
             #  - output channels = number of features
             #  - kernel_size = image feature size
-            Conv2d(1, 6, kernel_size=5, stride=1, padding=2),
-            BatchNorm2d(6),
+            Conv2d(1, 64, kernel_size=7, stride=1, padding=3),
+            BatchNorm2d(64),
             ReLU(inplace=True),
-            MaxPool2d(kernel_size=3, stride=stride, padding=1),
+            MaxPool2d(kernel_size=5, stride=stride, padding=2),
 
             # Another layer
-            Conv2d(6, conv_output_channels, kernel_size=5, stride=1, padding=2),
+            Conv2d(64, conv_output_channels, kernel_size=5, stride=1, padding=2),
             BatchNorm2d(conv_output_channels),
             ReLU(inplace=True),
             MaxPool2d(kernel_size=3, stride=stride, padding=1),
         )
 
-        self.linear_layers = Sequential(Linear(
-            int(conv_output_channels * h/stride/num_conv_layers * w/stride/num_conv_layers),
-            outputs))
+        self.linear_layers = Sequential(
+            Linear(int(conv_output_channels * h/stride/num_conv_layers * w/stride/num_conv_layers), 128),
+            nn.ReLU(),
+            Linear(128, 64),
+            nn.ReLU(),
+            Linear(64, outputs))
 
     # Defining the forward pass    
     def forward(self, x):
@@ -187,9 +190,10 @@ def test(dataloader, model, loss_fn):
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+#optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-epochs = 5
+epochs = 10
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
     train(train_dataloader, model, loss_fn, optimizer)
