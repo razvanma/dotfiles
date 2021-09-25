@@ -33,7 +33,8 @@ class ExperienceBuffer:
     def __init__(self, state_shape, action_shape, length):
         state_buf_shape = (length, *state_shape)
         self.state_buf = np.zeros(state_buf_shape, np.float32)
-
+        self.state_val_buf = np.zeros(state_buf_shape, np.float32)
+        
         if np.isscalar(action_shape):
             action_buf_shape = (length, action_shape)
         else:
@@ -43,14 +44,15 @@ class ExperienceBuffer:
         self.ptr = 0
         self.length = length
 
-    def record(self, state, action):
+    def record(self, state, action, state_val):
         self.state_buf[self.ptr] = state
         self.action_buf[self.ptr] = action
+        self.state_val_buf[self.ptr] = state_val
         self.ptr += 1
 
 
 class ConvNet(nn.Module):
-    def __init__(self, action_space, obs_space):
+    def __init__(self, obs_space, num_logits=1):
         super(ConvNet, self).__init__()
 
         conv_output_channels = 24
@@ -67,7 +69,7 @@ class ConvNet(nn.Module):
             ReLU(inplace=True),
             MaxPool2d(kernel_size=3, stride=stride, padding=1),
 
-            # Another layer
+            # Another layerriok
             Conv2d(6, conv_output_channels, kernel_size=5, stride=1, padding=2),
             BatchNorm2d(conv_output_channels),
             ReLU(inplace=True),
@@ -78,7 +80,7 @@ class ConvNet(nn.Module):
         w = obs_space.shape[1]
         self.linear_layers = Sequential(Linear(
             int(conv_output_channels * h/stride/num_conv_layers * w/stride/num_conv_layers),
-            action_space.n))
+            num_logits))
 
     # Defining the forward pass    
     def forward(self, x):
@@ -86,7 +88,6 @@ class ConvNet(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.linear_layers(x)
         return x
-
 
 epochs = 50
 steps = 5000
@@ -100,7 +101,8 @@ exp_buf = ExperienceBuffer(state.shape,
                            steps)
 
 # Define our policy network
-pi = ConvNet(env.action_space, env.observation_space)
+pi = ConvNet(env.observation_space, num_logits=env.action_space.n)
+val_net = ConvNet(env.observation_space, num_logits=1)
 
 done = False
 with Listener(on_press=go_interactive) as listener:
@@ -115,15 +117,20 @@ with Listener(on_press=go_interactive) as listener:
         # The observations are now in NHWC, but we need them in NCHW
         state_tensor = state_tensor.permute(0, 3, 1, 2)
 
-        #code.interact(local=locals()); 
         with torch.no_grad():
+            # Compute our CURRENT value and NEXT action
             pi_logits = pi(state_tensor)
-            action = Categorical(logits=pi_logits).sample().item()
+            action_model = Categorical(logits=pi_logits)
+            action = action_model.sample()
+            action_logp = action_model.log_prob(action)
+            action = action.item()
+            state_val = val_net(state_tensor).squeeze(-1).item()
 
+        # Do our NEXT action
         state, reward, done, info = env.step(action)
 
         # Record the effect of taking our action
-        exp_buf.record(state, action)
+        exp_buf.record(state, action, state_val)
 
         # Facilitates reasonable x11 viz
         # Make sure to first run 'export DISPLAY=unix:0'
