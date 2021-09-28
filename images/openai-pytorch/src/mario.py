@@ -202,7 +202,7 @@ max_steps_per_epoch = 5000
 
 # Each individual trajectory  can have a maximum length.  This is to
 # prevent trying to learn across piontlessly-long sequences.
-max_traj_len = 500
+max_traj_len = 100
 
 # Random seeds
 seed = 12345
@@ -239,10 +239,11 @@ with Listener(on_press=go_interactive) as listener:
             # Compute our CURRENT value and NEXT action
             action, action_logp = pi_net.compute_action(state)
 
-            # Here we calculate state_value so that we can train
-            # the value_net to try to estimate rewards-to-go
+            # Calculate state_value, used for computing GAE at the
+            # end of the trajectory and logged in the experience
+            # buffer for training our value_net to estimate the
+            # rewards-to-go at the end of the epoch.
             state_value = value_net.compute_state_value(state)
-            action = 1
 
             # Do our NEXT action
             #
@@ -255,6 +256,10 @@ with Listener(on_press=go_interactive) as listener:
 
             # Record the effect of taking our action
             exp_buf.record_step(state, action, state_value, action_logp, reward)
+
+            # TODO: In the future value novelty rather than de-valuing death
+            # TODO: Relatedly, consider detecting if we're failing to make
+            #       progress for too long and reset.
 
             # Note that "life" is stored as an unsigned BYTE
             died = info["life"] < last_life or info["life"] == 255
