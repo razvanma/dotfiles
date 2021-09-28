@@ -91,28 +91,35 @@ class ExperienceBuffer:
         self.rewards[self.ptr] = reward
         self.ptr += 1
 
-    def end_trajectory(self, final_value_to_go):
-        # Note that final_cost_to_go is an estimate of the infinite
+    def end_trajectory(self, final_reward_to_go):
+        # Note that final_reward_to_go is an estimate of the infinite
         # ctg for after the end of the trajecctory.
 
         # Use this slice to index and update trajectory values
         traj_slice = slice(self.ptr_start, self.ptr)
 
-        # Augment with our final estimated values-to-go
+        # Temporarily augment ACTUAL rewards with our final ESTIMATED
+        # values-to-go for the purpose of computing deltas below.
         rewards = np.append(
                 self.rewards[traj_slice],
-                final_value_to_go)
+                final_reward_to_go)
         state_values = np.append(
                 self.state_values[traj_slice],
-                final_value_to_go)
+                final_reward_to_go)
 
         # Compute GAE-Lambda using the discounted deltas
-        deltas = rewards[:-1] + self.gamma * state_values[1:] - state_values[:-1]
+        # Notice that the action_adv compares ACTUAL rewards to
+        # rewards-to-go ESTIMATED by our state_values model.
+        deltas = (rewards[:-1]
+                + self.gamma * state_values[1:]
+                - state_values[:-1])
+
         self.action_adv[traj_slice] = discount_cumsum(
                 deltas,
                 self.gamma * self.lam)
 
-        # Save all but the final
+        # Save all but the final reward.  Rewards-to-go will be used to
+        # train our state_value model at the end of the epoch.
         self.rewards_to_go[traj_slice] = discount_cumsum(
                 rewards,
                 self.gamma
@@ -216,6 +223,8 @@ exp_buf = ExperienceBuffer(state.shape,
 
 # Define our policy network
 pi_net = ConvNet(env.observation_space, num_logits=env.action_space.n)
+
+# For estimating discounted rewards-to-go given state
 value_net = ConvNet(env.observation_space, num_logits=1)
 done = False
 
@@ -229,6 +238,9 @@ with Listener(on_press=go_interactive) as listener:
 
             # Compute our CURRENT value and NEXT action
             action, action_logp = pi_net.compute_action(state)
+
+            # Here we calculate state_value so that we can train
+            # the value_net to try to estimate rewards-to-go
             state_value = value_net.compute_state_value(state)
             action = 1
 
@@ -241,14 +253,12 @@ with Listener(on_press=go_interactive) as listener:
             if info["life"] < last_life:
                 reward = -15
 
-            # BUGBUG
-            #if done:
-            #    env.reset()
-
             # Record the effect of taking our action
             exp_buf.record_step(state, action, state_value, action_logp, reward)
 
-            died = info["life"] < last_life
+            # Note that "life" is stored as an unsigned BYTE
+            died = info["life"] < last_life or info["life"] == 255
+
             if (exp_buf.last_traj_len() >= max_traj_len
                     or step == max_steps_per_epoch - 1
                     or died):
@@ -261,13 +271,23 @@ with Listener(on_press=go_interactive) as listener:
                     print("Done=True")
 
                 # Compute the value of the state AFTER acting
-                state_value = -15 if died else 0
-                state_value = value_net.compute_state_value(state)
+                if died:
+                    state_value = -15
+                else: # didn't die
+                    if done:
+                        # success == finished and didn't die
+                        state_value = 15
+                    else: # bootstrap the reward-to-go
+                        state_value = value_net.compute_state_value(state)
 
-                # BUGBUG should this be calculated from reward, esp when dead???
+                # Start over if done, regardless of whether we won or lost.
+                if done:
+                    env.reset()
+
+                # Update rewards-to-go and advantage
                 exp_buf.end_trajectory(state_value)
 
-            # For calculating if we died
+            # useful for calculating if we died later.
             last_life = info["life"]
 
             # Facilitates reasonable x11 viz
