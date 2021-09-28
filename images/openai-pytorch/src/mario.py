@@ -11,6 +11,7 @@ from nes_py.wrappers import JoypadSpace
 import gym_super_mario_bros
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 
+import scipy.signal
 import numpy as np
 import torch
 import torch.nn as nn
@@ -29,26 +30,95 @@ def go_interactive(key):
         exit_app = True
 
 
+def discount_cumsum(x, discount):
+    """
+    magic from rllab for computing discounted cumulative sums of vectors.
+    input: 
+        vector x, 
+        [x0, 
+         x1, 
+         x2]
+    output:
+        [x0 + discount * x1 + discount^2 * x2,  
+         x1 + discount * x2,
+         x2]
+    """
+    return scipy.signal.lfilter([1], [1, float(-discount)], x[::-1], axis=0)[::-1]
+
 class ExperienceBuffer:
-    def __init__(self, state_shape, action_shape, length):
-        state_buf_shape = (length, *state_shape)
-        self.state_buf = np.zeros(state_buf_shape, np.float32)
-        self.state_val_buf = np.zeros(state_buf_shape, np.float32)
-        
-        if np.isscalar(action_shape):
-            action_buf_shape = (length, action_shape)
-        else:
-            action_buf_shape = (length, *action_shape)
-        self.action_buf = np.zeros(action_buf_shape, np.float32)
-
+    def __init__(self, state_shape, action_shape, max_length, gamma=0.99, lam=0.95):
         self.ptr = 0
-        self.length = length
+        self.max_length = max_length
 
-    def record(self, state, action, state_val):
-        self.state_buf[self.ptr] = state
-        self.action_buf[self.ptr] = action
-        self.state_val_buf[self.ptr] = state_val
+        state_buf_shape = (max_length, *state_shape)
+        self.states = np.zeros(state_buf_shape, np.float32)
+
+        # The loss will be computed from the rewards and the logp(action)
+        # under the current policy.
+        self.action_logp = np.zeros(max_length, np.float32)
+
+        # The state value will be used in computing the advantage, which is
+        # used in computing the loss for the pi model.
+        self.state_values = np.zeros(max_length, np.float32)
+        self.rewards = np.zeros(max_length, np.float32)
+
+        if np.isscalar(action_shape):
+            action_buf_shape = (max_length, action_shape)
+        else:
+            action_buf_shape = (max_length, *action_shape)
+        self.actions = np.zeros(action_buf_shape, np.float32)
+
+        # At the end of a trajectory, we use ptr start to go back and update
+        # return-to-go and advantage 
+        self.ptr_start = 0
+
+        # Will hold advantage of the actual action taken, relative to the estimated
+        # value of the state, computeda at the end of each trajectory.
+        self.action_adv = np.zeros(max_length, np.float32) 
+        self.rewards_to_go = np.zeros(max_length, np.float32) 
+
+        self.gamma = gamma
+        self.lam = lam
+
+    def last_traj_len(self):
+        return self.ptr - self.ptr_start
+
+    def record_step(self, state, action, state_val, action_logp, reward):
+        self.states[self.ptr] = state
+        self.actions[self.ptr] = action
+        self.state_values[self.ptr] = state_val
+        self.action_logp[self.ptr] = action_logp
+        self.rewards[self.ptr] = reward
         self.ptr += 1
+
+    def end_trajectory(self, final_value_to_go):
+        # Note that final_cost_to_go is an estimate of the infinite
+        # ctg for after the end of the trajecctory.
+
+        # Use this slice to index and update trajectory values
+        traj_slice = slice(self.ptr_start, self.ptr)
+
+        # Augment with our final estimated values-to-go
+        rewards = np.append(
+                self.rewards[traj_slice],
+                final_value_to_go)
+        state_values = np.append(
+                self.state_values[traj_slice],
+                final_value_to_go)
+
+        # Compute GAE-Lambda using the discounted deltas
+        deltas = rewards[:-1] + self.gamma * state_values[1:] - state_values[:-1]
+        self.action_adv[traj_slice] = discount_cumsum(
+                deltas,
+                self.gamma * self.lam)
+
+        # Save all but the final
+        self.rewards_to_go[traj_slice] = discount_cumsum(
+                rewards,
+                self.gamma
+                )[:-1]
+
+        self.ptr_start = self.ptr
 
 
 class ConvNet(nn.Module):
@@ -89,56 +159,92 @@ class ConvNet(nn.Module):
         x = self.linear_layers(x)
         return x
 
-epochs = 50
-steps = 5000
-exp_buf = None
 
+# After each epoch, the simulator is reset
+max_epochs = 50
+max_steps_per_epoch = 5000
+
+# Each individual trajectory  can have a maximum length.  This is to
+# prevent trying to learn across piontlessly-long sequences.
+max_traj_len = 1000
+
+# Random seeds
+seed = 12345
+torch.manual_seed(seed)
+np.random.seed(seed)
+
+# Set up environment
 env = gym_super_mario_bros.make('SuperMarioBros-v0')
 env = JoypadSpace(env, SIMPLE_MOVEMENT)
 state = env.reset()
+
+# Set up buffer for recording states, actions, rewards, advantages, etc.
+# Note that our experience buffer holds MULTIPLE trajectories.
+# The life of the experience buffer is one epoch, then it should be reset.
 exp_buf = ExperienceBuffer(state.shape,
                            (env.action_space.n),
-                           steps)
+                           max_steps_per_epoch)
 
 # Define our policy network
 pi = ConvNet(env.observation_space, num_logits=env.action_space.n)
 val_net = ConvNet(env.observation_space, num_logits=1)
 
 done = False
+
 with Listener(on_press=go_interactive) as listener:
-    for step in range(steps):
-        # Note that torch doesn't support negative numpy strides
-        # Also, we need the inputs to be floats, not Bytes
-        state_tensor = torch.from_numpy(np.ascontiguousarray(state)).float()
+    for epoch in range(max_epochs):
+        for step in range(max_steps_per_epoch):
+            # Note that torch doesn't support negative numpy strides
+            # Also, we need the inputs to be floats, not Bytes
+            state_tensor = torch.from_numpy(np.ascontiguousarray(state)).float()
 
-        # The first dimension must be a batch dimension, create it now.
-        state_tensor = state_tensor.unsqueeze(0)
+            # The first dimension must be a batch dimension, create it now.
+            state_tensor = state_tensor.unsqueeze(0)
 
-        # The observations are now in NHWC, but we need them in NCHW
-        state_tensor = state_tensor.permute(0, 3, 1, 2)
+            # The observations are now in NHWC, but we need them in NCHW
+            state_tensor = state_tensor.permute(0, 3, 1, 2)
 
-        with torch.no_grad():
-            # Compute our CURRENT value and NEXT action
-            pi_logits = pi(state_tensor)
-            action_model = Categorical(logits=pi_logits)
-            action = action_model.sample()
-            action_logp = action_model.log_prob(action)
-            action = action.item()
-            state_val = val_net(state_tensor).squeeze(-1).item()
+            with torch.no_grad():
+                # Compute our CURRENT value and NEXT action
+                pi_logits = pi(state_tensor)
+                action_model = Categorical(logits=pi_logits)
 
-        # Do our NEXT action
-        state, reward, done, info = env.step(action)
+                # Compute NEXT action to do
+                action = action_model.sample()
 
-        # Record the effect of taking our action
-        exp_buf.record(state, action, state_val)
+                # Compute log(prob(action)) under our policy model
+                action_logp = action_model.log_prob(action)
+                action = action.item()
 
-        # Facilitates reasonable x11 viz
-        # Make sure to first run 'export DISPLAY=unix:0'
-        time.sleep(0.01)
-        env.render()
+                # Compute the value of the state BEFORE acting
+                state_val = val_net(state_tensor).squeeze(-1).item()
 
-        # Hit delete to drop into the interactive shell
-        if pause: code.interact(local=locals()); pause = False
-        if exit_app: sys.exit()
+            # Do our NEXT action
+            state, reward, done, info = env.step(action)
+
+            # BUGBUG tweak the reward manually, right now it's not quite
+            # right --https://pypi.org/project/gym-super-mario-bros/ 
+
+            # Record the effect of taking our action
+            exp_buf.record_step(state, action, state_val, action_logp, reward)
+
+            if (exp_buf.last_traj_len() >= max_traj_len
+                    or step == max_steps_per_epoch - 1
+                    or done):
+
+                # Compute the value of the state AFTER acting
+                # BUGBUG zero might not be the right default here....
+                state_val = 0
+                exp_buf.end_trajectory(state_val)
+
+
+            # Facilitates reasonable x11 viz
+            # Make sure to first run 'export DISPLAY=unix:0'
+            time.sleep(0.01)
+            env.render()
+
+            # Hit delete to drop into the interactive shell
+            if pause: code.interact(local=locals()); pause = False
+            if exit_app: sys.exit()
 
 env.close()
