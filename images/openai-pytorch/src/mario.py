@@ -58,7 +58,7 @@ class ExperienceBuffer:
         self.action_logp = np.zeros(max_length, np.float32)
 
         # The state value will be used in computing the advantage, which is
-        # used in computing the loss for the pi model.
+        # used in computing losses.
         self.state_values = np.zeros(max_length, np.float32)
         self.rewards = np.zeros(max_length, np.float32)
 
@@ -83,10 +83,10 @@ class ExperienceBuffer:
     def last_traj_len(self):
         return self.ptr - self.ptr_start
 
-    def record_step(self, state, action, state_val, action_logp, reward):
+    def record_step(self, state, action, state_value, action_logp, reward):
         self.states[self.ptr] = state
         self.actions[self.ptr] = action
-        self.state_values[self.ptr] = state_val
+        self.state_values[self.ptr] = state_value
         self.action_logp[self.ptr] = action_logp
         self.rewards[self.ptr] = reward
         self.ptr += 1
@@ -159,6 +159,35 @@ class ConvNet(nn.Module):
         x = self.linear_layers(x)
         return x
 
+    def _tensor_from_state(self, state):
+        # Note that torch doesn't support negative numpy strides
+        # Also, we need the inputs to be floats, not Bytes
+        state_tensor = torch.from_numpy(np.ascontiguousarray(state)).float()
+
+        # The first dimension must be a batch dimension, create it now.
+        state_tensor = state_tensor.unsqueeze(0)
+
+        # The observations are now in NHWC, but we need them in NCHW
+        return state_tensor.permute(0, 3, 1, 2)
+
+    def compute_action(self, state):
+        with torch.no_grad():
+            state_tensor = self._tensor_from_state(state)
+            pi_logits = self(state_tensor)
+            action_model = Categorical(logits=pi_logits)
+
+            # Compute log(prob(action)) under our policy model
+            action = action_model.sample()
+            action_logp = action_model.log_prob(action)
+
+            return action.item(), action_logp
+
+    def compute_state_value(self, state):
+        with torch.no_grad():
+            # Compute the value of the state BEFORE acting BUGBUG
+            state_tensor = self._tensor_from_state(state)
+            state_value = self(state_tensor).squeeze(-1).item()
+            return state_value
 
 # After each epoch, the simulator is reset
 max_epochs = 50
@@ -166,7 +195,7 @@ max_steps_per_epoch = 5000
 
 # Each individual trajectory  can have a maximum length.  This is to
 # prevent trying to learn across piontlessly-long sequences.
-max_traj_len = 1000
+max_traj_len = 500
 
 # Random seeds
 seed = 12345
@@ -186,57 +215,60 @@ exp_buf = ExperienceBuffer(state.shape,
                            max_steps_per_epoch)
 
 # Define our policy network
-pi = ConvNet(env.observation_space, num_logits=env.action_space.n)
-val_net = ConvNet(env.observation_space, num_logits=1)
-
+pi_net = ConvNet(env.observation_space, num_logits=env.action_space.n)
+value_net = ConvNet(env.observation_space, num_logits=1)
 done = False
+
+# Dummy step to get out info state.
+_, _, _, info = env.step(0)
+last_life = info["life"]
 
 with Listener(on_press=go_interactive) as listener:
     for epoch in range(max_epochs):
         for step in range(max_steps_per_epoch):
-            # Note that torch doesn't support negative numpy strides
-            # Also, we need the inputs to be floats, not Bytes
-            state_tensor = torch.from_numpy(np.ascontiguousarray(state)).float()
 
-            # The first dimension must be a batch dimension, create it now.
-            state_tensor = state_tensor.unsqueeze(0)
-
-            # The observations are now in NHWC, but we need them in NCHW
-            state_tensor = state_tensor.permute(0, 3, 1, 2)
-
-            with torch.no_grad():
-                # Compute our CURRENT value and NEXT action
-                pi_logits = pi(state_tensor)
-                action_model = Categorical(logits=pi_logits)
-
-                # Compute NEXT action to do
-                action = action_model.sample()
-
-                # Compute log(prob(action)) under our policy model
-                action_logp = action_model.log_prob(action)
-                action = action.item()
-
-                # Compute the value of the state BEFORE acting
-                state_val = val_net(state_tensor).squeeze(-1).item()
+            # Compute our CURRENT value and NEXT action
+            action, action_logp = pi_net.compute_action(state)
+            state_value = value_net.compute_state_value(state)
+            action = 1
 
             # Do our NEXT action
+            #
+            # Reward = velocity + clock_ticks_penalty + death_penalty
+            # Reward is capped between -15 and 15.
+            #   See https://pypi.org/project/gym-super-mario-bros/ 
             state, reward, done, info = env.step(action)
+            if info["life"] < last_life:
+                reward = -15
 
-            # BUGBUG tweak the reward manually, right now it's not quite
-            # right --https://pypi.org/project/gym-super-mario-bros/ 
+            # BUGBUG
+            #if done:
+            #    env.reset()
 
             # Record the effect of taking our action
-            exp_buf.record_step(state, action, state_val, action_logp, reward)
+            exp_buf.record_step(state, action, state_value, action_logp, reward)
 
+            died = info["life"] < last_life
             if (exp_buf.last_traj_len() >= max_traj_len
                     or step == max_steps_per_epoch - 1
-                    or done):
+                    or died):
+
+                if died:
+                    print("Died")
+                if exp_buf.last_traj_len() >= max_traj_len:
+                    print("Ending long trajectory.")
+                if done:
+                    print("Done=True")
 
                 # Compute the value of the state AFTER acting
-                # BUGBUG zero might not be the right default here....
-                state_val = 0
-                exp_buf.end_trajectory(state_val)
+                state_value = -15 if died else 0
+                state_value = value_net.compute_state_value(state)
 
+                # BUGBUG should this be calculated from reward, esp when dead???
+                exp_buf.end_trajectory(state_value)
+
+            # For calculating if we died
+            last_life = info["life"]
 
             # Facilitates reasonable x11 viz
             # Make sure to first run 'export DISPLAY=unix:0'
