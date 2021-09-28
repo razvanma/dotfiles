@@ -40,8 +40,9 @@ xrandr --output eDP-1 --gamma 1.0:0.8:0.7 --brightness 0.39
 synclient PalmDetect=1
 synclient PalmMinWidth=4
 synclient PalmMinZ=50
-synclient AreaRightEdge=1140
-synclient AreaLeftEdge=90
+synclient AreaRightEdge=1130
+synclient AreaLeftEdge=100
+synclient AreaTopEdge=100
 
 synclient TapButton1=1 # one-button tap
 synclient TapButton2=3 # 2-button tap => right click

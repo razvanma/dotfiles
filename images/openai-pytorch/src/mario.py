@@ -13,8 +13,10 @@ from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 
 import scipy.signal
 import numpy as np
+
 import torch
 import torch.nn as nn
+from torch.optim import Adam
 from torch.nn import Conv2d, BatchNorm2d, ReLU, MaxPool2d, Sequential, Linear
 from torch.distributions.categorical import Categorical
 
@@ -230,7 +232,11 @@ pi_net = ConvNet(env.observation_space, num_logits=env.action_space.n)
 value_net = ConvNet(env.observation_space, num_logits=1)
 done = False
 
-# Dummy step to get out info state.
+# Initialize our optimizers, note the learning reates
+pi_optimizer = Adam(pi_net.parameters(), lr=3e-4)
+value_optimizer = Adam(value_net.parameters(), lr=1e-3)
+
+# Dummy step to get out a first info state.
 _, _, _, info = env.step(0)
 last_life = info["life"]
 
