@@ -128,6 +128,8 @@ class ExperienceBuffer:
         self.ptr_start = self.ptr
 
 
+# TODO: Notice how we're abusing this class for implementing
+#       both pi and the value net
 class ConvNet(nn.Module):
     def __init__(self, obs_space, num_logits=1):
         super(ConvNet, self).__init__()
