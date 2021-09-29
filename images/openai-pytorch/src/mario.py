@@ -200,8 +200,11 @@ class ConvNet(nn.Module):
         # The observations are now in NHWC, but we need them in NCHW
         return state_tensor.permute(0, 3, 1, 2)
 
-    def compute_action(self, state):
+    def compute_action_no_grad(self, state):
         with torch.no_grad():
+            return self.compute_action(state)
+
+    def compute_action(self, state):
             state_tensor = self._tensor_from_state(state)
             pi_logits = self(state_tensor)
             action_model = Categorical(logits=pi_logits)
@@ -213,7 +216,6 @@ class ConvNet(nn.Module):
             return action.item(), action_logp
 
     def compute_state_value(self, state):
-        with torch.no_grad():
             # Compute the value of the state BEFORE acting BUGBUG
             state_tensor = self._tensor_from_state(state)
             state_value = self(state_tensor).squeeze(-1).item()
@@ -271,13 +273,15 @@ with Listener(on_press=go_interactive) as listener:
             #       non-greedy actions.
 
             # Compute our CURRENT value and NEXT action
-            action, action_logp = pi_net.compute_action(state)
+            with torch.no_grad():
+                action, action_logp = pi_net.compute_action(state)
 
             # Calculate state_value, used for computing GAE at the
             # end of the trajectory and logged in the experience
             # buffer for training our value_net to estimate the
             # rewards-to-go at the end of the epoch.
-            state_value = value_net.compute_state_value(state)
+            with torch.no_grad():
+                state_value = value_net.compute_state_value(state)
 
             # Do our NEXT action
             #
@@ -340,6 +344,28 @@ with Listener(on_press=go_interactive) as listener:
 
         # End of an episode, train on our buffer and reset
         data = exp_buf.get_and_reset()
+
+        # First, train the policy for one step.
+
+        # We must pass the state and action through our policy
+        # model so that we can compute a gradient against the loss.
+        #
+        # Tricky: we use action_logp from the model so that we can
+        # get a gradient, but advantage is precomputed from exp_buf.
+        action, action_logp = pi_net.compute_action(state)
+        pi_optimizer.zero_grad()
+        pi_loss = -data['action_adv'] * action_logp 
+        pi_loss = pi_loss.mean()
+        pi_loss.backward()
+        pi_optimizer.step()
+
+        # Next, train the value function for many iterations
+        # to estimate discounted rewards-to-go given state.
+        #for i in range(100):
+        #    value_optimizer.zero_grad()
+        #    loss_v = compute_loss_v(data)
+        #    loss_v.backward()
+        #    value_optimizer.step()
 
         # TODO: consider randomly saving and restoring the state
         #       to speed up learning.
