@@ -145,8 +145,13 @@ class ExperienceBuffer:
                 state_values=self.state_values,
                 action_logp=self.action_logp,
                 rewards=self.rewards,
+                rewards_to_go=self.rewards_to_go,
                 action_adv=self.action_adv)
-        return {k: torch.as_tensor(v, dtype=torch.float32) for k,v in data.items()}
+        ret = {k: torch.as_tensor(v, dtype=torch.float32) for k,v in data.items()}
+
+        # Observations in NHWC, but we'll need them in NCHW
+        ret['states'] = ret['states'].permute(0, 3, 1, 2)
+        return ret
 
 
 # TODO: Notice how we're abusing this class for implementing
@@ -189,8 +194,8 @@ class ConvNet(nn.Module):
         x = self.linear_layers(x)
         return x
 
-    def _tensor_from_state(self, state):
-        # Note that torch doesn't support negative numpy strides
+    def tensor_from_state(self, state):
+        # Note that pytorch doesn't support negative numpy strides
         # Also, we need the inputs to be floats, not Bytes
         state_tensor = torch.from_numpy(np.ascontiguousarray(state)).float()
 
@@ -200,25 +205,19 @@ class ConvNet(nn.Module):
         # The observations are now in NHWC, but we need them in NCHW
         return state_tensor.permute(0, 3, 1, 2)
 
-    def compute_action_no_grad(self, state):
-        with torch.no_grad():
-            return self.compute_action(state)
-
-    def compute_action(self, state):
-            state_tensor = self._tensor_from_state(state)
+    def compute_action(self, state_tensor):
             pi_logits = self(state_tensor)
             action_model = Categorical(logits=pi_logits)
 
             # Compute log(prob(action)) under our policy model
+            # TODO Note that this is where we can add exploration
             action = action_model.sample()
             action_logp = action_model.log_prob(action)
 
-            return action.item(), action_logp
+            return action, action_logp
 
-    def compute_state_value(self, state):
-            # Compute the value of the state BEFORE acting BUGBUG
-            state_tensor = self._tensor_from_state(state)
-            state_value = self(state_tensor).squeeze(-1).item()
+    def compute_state_value(self, state_tensor):
+            state_value = self(state_tensor).squeeze(-1)
             return state_value
 
 # After each epoch, we train, clear our experience buffer and
@@ -273,15 +272,21 @@ with Listener(on_press=go_interactive) as listener:
             #       non-greedy actions.
 
             # Compute our CURRENT value and NEXT action
+            state_tensor = None
             with torch.no_grad():
-                action, action_logp = pi_net.compute_action(state)
+                state_tensor = pi_net.tensor_from_state(state)
+                action, action_logp = pi_net.compute_action(state_tensor)
+                action = action.item()
 
             # Calculate state_value, used for computing GAE at the
             # end of the trajectory and logged in the experience
             # buffer for training our value_net to estimate the
             # rewards-to-go at the end of the epoch.
             with torch.no_grad():
-                state_value = value_net.compute_state_value(state)
+                # This is the estimated value-to-go of the state
+                # BEFORE acting BUGBUG
+                state_value = (
+                        value_net.compute_state_value(state_tensor).item())
 
             # Do our NEXT action
             #
@@ -321,7 +326,10 @@ with Listener(on_press=go_interactive) as listener:
                         # success == finished and didn't die
                         state_value = 15
                     else: # bootstrap the reward-to-go
-                        state_value = value_net.compute_state_value(state)
+                        # This is the state estimate AFTER acting
+                        state_tensor = pi_net.tensor_from_state(state)
+                        state_value = value_net.compute_state_value(
+                                state_tensor).item()
 
                 # Start over if done, regardless of whether we won or lost.
                 if done:
@@ -347,25 +355,33 @@ with Listener(on_press=go_interactive) as listener:
 
         # First, train the policy for one step.
 
-        # We must pass the state and action through our policy
-        # model so that we can compute a gradient against the loss.
+        # We must pass the state through our policy model so that we
+        # can compute a gradient against the loss.
         #
         # Tricky: we use action_logp from the model so that we can
         # get a gradient, but advantage is precomputed from exp_buf.
-        action, action_logp = pi_net.compute_action(state)
-        pi_optimizer.zero_grad()
+        print("Do one pi training step.")
+        action, action_logp = pi_net.compute_action(data['states'])
         pi_loss = -data['action_adv'] * action_logp 
         pi_loss = pi_loss.mean()
+
+        pi_optimizer.zero_grad()
         pi_loss.backward()
         pi_optimizer.step()
 
         # Next, train the value function for many iterations
         # to estimate discounted rewards-to-go given state.
-        #for i in range(100):
-        #    value_optimizer.zero_grad()
-        #    loss_v = compute_loss_v(data)
-        #    loss_v.backward()
-        #    value_optimizer.step()
+        for i in range(100):
+            if i % 10 == 0:
+                print("Do 10 steps of value traning.")
+
+            state_value = value_net.compute_state_value(data['states'])
+            value_loss = state_value - data['rewards_to_go']
+            value_loss = (value_loss ** 2).mean()
+
+            value_optimizer.zero_grad()
+            value_loss.backward()
+            value_optimizer.step()
 
         # TODO: consider randomly saving and restoring the state
         #       to speed up learning.
