@@ -129,6 +129,25 @@ class ExperienceBuffer:
 
         self.ptr_start = self.ptr
 
+    def get_and_reset(self):
+        assert self.ptr == self.max_length
+        self.ptr, self.ptr_start = 0, 0
+
+        # Normalize the advantage
+        self.action_adv -= self.action_adv.mean()
+        self.action_adv /= self.action_adv.std()
+
+        # Convert the numpy arrays into pytorch tensors and
+        # return them as a dictionary.
+        data = dict(
+                states=self.states,
+                actions=self.actions,
+                state_values=self.state_values,
+                action_logp=self.action_logp,
+                rewards=self.rewards,
+                action_adv=self.action_adv)
+        return {k: torch.as_tensor(v, dtype=torch.float32) for k,v in data.items()}
+
 
 # TODO: Notice how we're abusing this class for implementing
 #       both pi and the value net
@@ -200,9 +219,12 @@ class ConvNet(nn.Module):
             state_value = self(state_tensor).squeeze(-1).item()
             return state_value
 
-# After each epoch, the simulator is reset
+# After each epoch, we train, clear our experience buffer and
+# reset the environment.
 max_epochs = 50
-max_steps_per_epoch = 5000
+
+# Governs number of steps to take between training.
+max_steps_per_epoch = 200
 
 # Each individual trajectory  can have a maximum length.  This is to
 # prevent trying to learn across piontlessly-long sequences.
@@ -243,6 +265,10 @@ last_life = info["life"]
 with Listener(on_press=go_interactive) as listener:
     for epoch in range(max_epochs):
         for step in range(max_steps_per_epoch):
+
+            # TODO: note that if we had a dynamics model, we could use
+            #       our value function with look-aheads to compute
+            #       non-greedy actions.
 
             # Compute our CURRENT value and NEXT action
             action, action_logp = pi_net.compute_action(state)
@@ -311,5 +337,12 @@ with Listener(on_press=go_interactive) as listener:
             # Hit delete to drop into the interactive shell
             if pause: code.interact(local=locals()); pause = False
             if exit_app: sys.exit()
+
+        # End of an episode, train on our buffer and reset
+        data = exp_buf.get_and_reset()
+
+        # TODO: consider randomly saving and restoring the state
+        #       to speed up learning.
+        
 
 env.close()
