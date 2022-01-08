@@ -90,3 +90,23 @@ docker run -d -p 8080:8080 -v `pwd`:/home --gpus all --device /dev/nvidia0 --dev
 
 # docker / tf: https://www.youtube.com/watch?v=eY7znLC9PDw#
 
+# Update arch
+sudo pacman -Syu
+
+# install ngspice / kicad
+sudo pacman -S ngspice
+sudo pacman -S kicad
+sudo pacman -S kicad-library
+
+# arduino
+sudo pacman -S arduino
+sudo pacman -S arduino-cli
+sudo pacman -S arduino-avr-core
+sudo pacman -S avr-libc
+yay -S arduino-mk
+
+# arduino-cli board list
+# arduino-cli core install arduino:avr
+# arduino-cli compile -b arduino:avr:uno ./blink.ino
+# sudo arduino-cli core install arduino:avr
+# sudo arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno ./blink.ino
