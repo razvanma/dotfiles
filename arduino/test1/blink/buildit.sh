@@ -22,3 +22,8 @@ screen /dev/ttyACM0 9600
 arduino-cli compile -b arduino:avr:uno
 sudo arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno
 
+# Record and decode
+rtl_433 -f 315M -S unknown
+rtl_433 -A *.cu8
+
+# Go to triq.org to view .cu8 files

@@ -22,7 +22,7 @@ void setup() {
 
 void loop() {
 
-  unsigned long value = 13;
+  unsigned long value = 2796202; 
   s.send(value, 32);
 
   if (s.available()) {
@@ -37,5 +37,5 @@ void loop() {
     s.resetAvailable();
     // digitalWrite(LED_BUILTIN, false);
   }
-  delay(500);
+  delay(2000);
 }
