@@ -14,7 +14,7 @@ void setup() {
 
   s.enableReceive(digitalPinToInterrupt(2));
   s.enableTransmit(4);
-  s.setRepeatTransmit(10);
+  s.setRepeatTransmit(1);
   //attachInterrupt(digitalPinToInterrupt(2), handleInterrupt, CHANGE);
 
   Serial.println("[+] Listening");
@@ -22,7 +22,7 @@ void setup() {
 
 void loop() {
 
-  unsigned long value = 2796202; 
+  unsigned long value = 7; 
   s.send(value, 32);
 
   if (s.available()) {
@@ -37,5 +37,5 @@ void loop() {
     s.resetAvailable();
     // digitalWrite(LED_BUILTIN, false);
   }
-  delay(2000);
+  delay(5);
 }

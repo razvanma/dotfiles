@@ -22,8 +22,15 @@ screen /dev/ttyACM0 9600
 arduino-cli compile -b arduino:avr:uno
 sudo arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno
 
-# Record and decode
+# Record and decode at 315Mhz
 rtl_433 -f 315M -S unknown
 rtl_433 -A *.cu8
 
 # Go to triq.org to view .cu8 files
+
+# Script to scan and viz a broad range of frequencies
+# http://kmkeen.com/tmp/heatmap.py.txt
+rtl_power -f 150M:160M:1k -e 1m -i 1s survey.csv
+python heatmap.py survey.csv survey.png
+
+
