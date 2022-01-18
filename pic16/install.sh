@@ -7,9 +7,10 @@ sudo pacman -S sdcc
 sudo pacman -Syyu
 pacman -Sl | grep lib32
 
-# Install the programmers
+# Install required libraries, including XC8 compiler
 yay -S lib32-fakeroot
 yay -S microchip-mplabx-bin
+yay -S microchip-mplabxc8-bin
 
 # Run full mplab IDE, press alt=>v=>f to get screen to redraw
 mplab_ide
