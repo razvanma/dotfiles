@@ -34,7 +34,7 @@ fi
 
 # Lower the brightness,resolution band blue tones
 xrandr --output eDP-1 --mode 1920x1080
-xrandr --output eDP-1 --gamma 1.0:0.8:0.7 --brightness 0.39
+xrandr --output eDP-1 --gamma 1.0:0.8:0.7 --brightness 0.9
 
 # Get the touchpad settings going
 synclient PalmDetect=1

@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-# files:
+# files, control brigness, mouse bounds, etc:
 # ~/.xinitrc
 # ~/.Xresources
 

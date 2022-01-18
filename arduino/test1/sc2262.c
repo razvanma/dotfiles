@@ -1,5 +1,9 @@
 // From https://forum.arduino.cc/t/controlling-remote-controlled-sockets-sc2262-emulation-by-arduino/60513/
 //
+// Also see rtl_433 code here: https://github.com/merbanan/rtl_433/blob/master/src/devices/generic_remote.c  
+//
+// Also see RFSwitch code for protocols: https://github.com/sui77/rc-switch/blob/master/RCSwitch.cpp 
+//
 #define TRANSMITTER 13 // The Arduino output pin 13 is used to drive 433 MHz AM transmitter
 #define SC2262Clock 100 // SC2262 internal clock is run at 10KHz for “smj” transmitter device (3.3MOhm timing resistor), therefore 100 microSecond wavelength
 
