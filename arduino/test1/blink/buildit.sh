@@ -12,11 +12,14 @@ sudo arduino-cli core install arduino:avr
 sudo busybox microcom -t 9600 /dev/ttyACM0
 
 # connect to the device to send / receive serial data
-screen /dev/ttyACM0 9600
+# Ctrl+a, k to kill
+sudo screen /dev/ttyACM0 9600
 
 # Install the RCSwitch library from github.
 # 1. Download zip from https://github.com/sui77/rc-switch 
 # 2. Run 'arduino' and go to Sketch=>Include Library=>Add Zip Library
+# 3. Use this command to see where it's installed:
+arduino-cli lib examples rc-switch-2.6.4
 
 # Compile the sketch and su upload
 arduino-cli compile -b arduino:avr:uno
