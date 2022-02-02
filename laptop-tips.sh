@@ -110,3 +110,10 @@ yay -S arduino-mk
 # arduino-cli compile -b arduino:avr:uno ./blink.ino
 # sudo arduino-cli core install arduino:avr
 # sudo arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno ./blink.ino
+
+# RADIO:
+
+# sdr-rtl program for arch:
+# pulseaudio -D
+# gqrx, for HF use this setting: "rtl=0,direct_samp=2"
+# sdrangel

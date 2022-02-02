@@ -33,7 +33,9 @@ rtl_433 -A *.cu8
 
 # Script to scan and viz a broad range of frequencies
 # http://kmkeen.com/tmp/heatmap.py.txt
-rtl_power -f 150M:160M:1k -e 1m -i 1s survey.csv
+rtl_power -f 118M:137M:10k -e 5m -i 1s survey.csv
 python heatmap.py survey.csv survey.png
 
-
+# For tuning and scanning.  sdrangel has many pluggins.
+sdrangel
+gqrx
