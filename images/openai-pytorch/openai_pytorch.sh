@@ -1,4 +1,5 @@
 xhost +local:127.0.0.1
+xhost +local:docker
 
 # docker build -t openai_torch .
 docker run \

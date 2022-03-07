@@ -75,7 +75,7 @@ class ExperienceBuffer:
         self.ptr_start = 0
 
         # Will hold advantage of the actual action taken, relative to the estimated
-        # value of the state, computeda at the end of each trajectory.
+        # value of the state, computed at the end of each trajectory.
         self.action_adv = np.zeros(max_length, np.float32) 
         self.rewards_to_go = np.zeros(max_length, np.float32) 
 
@@ -95,7 +95,8 @@ class ExperienceBuffer:
 
     def end_trajectory(self, final_reward_to_go):
         # Note that final_reward_to_go is an estimate of the infinite
-        # ctg for after the end of the trajecctory.
+        # ctg for after the end of the trajectory. If the player dies,
+        # it will be very negative.
 
         # Use this slice to index and update trajectory values
         traj_slice = slice(self.ptr_start, self.ptr)
@@ -110,12 +111,13 @@ class ExperienceBuffer:
                 final_reward_to_go)
 
         # Compute GAE-Lambda using the discounted deltas
-        # Notice that the action_adv compares ACTUAL rewards to
-        # rewards-to-go ESTIMATED by our state_values model.
         deltas = (rewards[:-1]
                 + self.gamma * state_values[1:]
                 - state_values[:-1])
 
+        # Notice that the action_adv compares ACTUAL rewards 
+        # (one at each time step for the action taken) to
+        # rewards-to-go ESTIMATED by our state_values model.
         self.action_adv[traj_slice] = discount_cumsum(
                 deltas,
                 self.gamma * self.lam)
@@ -202,10 +204,11 @@ class ConvNet(nn.Module):
         # The first dimension must be a batch dimension, create it now.
         state_tensor = state_tensor.unsqueeze(0)
 
-        # The observations are now in NHWC, but we need them in NCHW
+        # The observations are now in NHWC (number, height, width, channel),
+        # but we need them in NCHW
         return state_tensor.permute(0, 3, 1, 2)
 
-    def compute_action(self, state_tensor):
+    def sample_one_action(self, state_tensor):
             pi_logits = self(state_tensor)
             action_model = Categorical(logits=pi_logits)
 
@@ -216,7 +219,7 @@ class ConvNet(nn.Module):
 
             return action, action_logp
 
-    def compute_state_value(self, state_tensor):
+    def estimate_state_value(self, state_tensor):
             state_value = self(state_tensor).squeeze(-1)
             return state_value
 
@@ -244,6 +247,7 @@ state = env.reset()
 # Set up buffer for recording states, actions, rewards, advantages, etc.
 # Note that our experience buffer holds MULTIPLE trajectories.
 # The life of the experience buffer is one epoch, then it should be reset.
+print("State shape: {}".format(state.shape))
 exp_buf = ExperienceBuffer(state.shape,
                            (env.action_space.n),
                            max_steps_per_epoch)
@@ -275,9 +279,11 @@ with Listener(on_press=go_interactive) as listener:
             state_tensor = None
             with torch.no_grad():
                 state_tensor = pi_net.tensor_from_state(state)
-                action, action_logp = pi_net.compute_action(state_tensor)
+                action, action_logp = pi_net.sample_one_action(state_tensor)
                 action = action.item()
 
+            # Estimate value BEFORE doing an action
+            #
             # Calculate state_value, used for computing GAE at the
             # end of the trajectory and logged in the experience
             # buffer for training our value_net to estimate the
@@ -286,9 +292,9 @@ with Listener(on_press=go_interactive) as listener:
                 # This is the estimated value-to-go of the state
                 # BEFORE acting BUGBUG
                 state_value = (
-                        value_net.compute_state_value(state_tensor).item())
+                        value_net.estimate_state_value(state_tensor).item())
 
-            # Do our NEXT action
+            # DO our NEXT action
             #
             # Reward = velocity + clock_ticks_penalty + death_penalty
             # Reward is capped between -15 and 15.
@@ -328,7 +334,7 @@ with Listener(on_press=go_interactive) as listener:
                     else: # bootstrap the reward-to-go
                         # This is the state estimate AFTER acting
                         state_tensor = pi_net.tensor_from_state(state)
-                        state_value = value_net.compute_state_value(
+                        state_value = value_net.estimate_state_value(
                                 state_tensor).item()
 
                 # Start over if done, regardless of whether we won or lost.
@@ -361,7 +367,7 @@ with Listener(on_press=go_interactive) as listener:
         # Tricky: we use action_logp from the model so that we can
         # get a gradient, but advantage is precomputed from exp_buf.
         print("Do one pi training step.")
-        action, action_logp = pi_net.compute_action(data['states'])
+        action, action_logp = pi_net.sample_one_action(data['states'])
         pi_loss = -data['action_adv'] * action_logp 
         pi_loss = pi_loss.mean()
 
@@ -375,7 +381,7 @@ with Listener(on_press=go_interactive) as listener:
             if i % 10 == 0:
                 print("Do 10 steps of value traning.")
 
-            state_value = value_net.compute_state_value(data['states'])
+            state_value = value_net.estimate_state_value(data['states'])
             value_loss = state_value - data['rewards_to_go']
             value_loss = (value_loss ** 2).mean()
 

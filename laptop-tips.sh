@@ -111,9 +111,33 @@ yay -S arduino-mk
 # sudo arduino-cli core install arduino:avr
 # sudo arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno ./blink.ino
 
-# RADIO:
+################# RADIO ###################
 
 # sdr-rtl program for arch:
 # pulseaudio -D
 # gqrx, for HF use this setting: "rtl=0,direct_samp=2"
 # sdrangel
+
+
+################# Digital Speech Decoding #######
+
+# With gqrx and sds:
+# https://docs.google.com/document/d/128yNeSW30es2N0-A9nu8sG9VDBuWdiJgZPCSOmvcPGM/edit
+
+# sdrangel also works with DSD Demodulator (not as well)
+
+################# NETWORK #################
+# Profiles at startup (may want to delete):
+#   /etc/systemd/system/netctl*
+# Add to startup
+#   netctl enable wlp-...
+
+# Profiles available:
+#   /etc/netctl/*
+# Rebuild profile:
+#   sudo wifi-menu
+
+# Check status:
+#   sudo netctl status wlp-...
+# If failed to connect, restart it, and give it some time:
+#   netctl restart wlp-...
