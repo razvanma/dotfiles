@@ -1,0 +1,11 @@
+numpy
+pandas
+matplotlib
+sentence-transformers
+scann
+h5py
+beautifulsoup4
+ijson
+tensorflow-recommenders
+tensorflow-text
+seaborn
