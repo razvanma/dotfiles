@@ -6,4 +6,4 @@ docker run \
   --device /dev/nvidiactl \
   -v $(pwd)/content:/tf/content \
   -p 8888:8888 \
-  -it tf1
+  -it tf-jupyter

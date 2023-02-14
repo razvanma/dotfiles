@@ -1,1 +1,1 @@
-docker build -t tf1 .
+docker build -t tf-jupyter .
