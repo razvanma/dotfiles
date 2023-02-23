@@ -1,0 +1,33 @@
+# https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
+FROM node:16
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+COPY package*.json ./
+
+RUN npm install
+RUN apt-get update -y
+RUN apt-get -y install cmake
+RUN apt-get -y install git
+
+RUN git clone https://github.com/tensorflow/tfjs
+
+#RUN git clone https://github.com/usefulsensors/openai-whisper.git
+
+#wget https://github.com/Kitware/CMake/releases/download/v3.25.2/cmake-3.25.2-linux-x86_64.sh
+#chmod u+x cmake-3.25.2-linux-x86_64.sh
+#./cmake-3.25.2-linux-x86_64.sh
+
+# If you are building your code for production
+# RUN npm ci --only=production
+
+# Bundle app source
+COPY . .
+
+EXPOSE 8080
+CMD [ "node", "server.js" ]
+
