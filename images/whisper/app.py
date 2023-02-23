@@ -1,6 +1,7 @@
 # https://lablab.ai/t/whisper-api-flask-docker
 
-from flask import Flask, abort, request
+from flask import Flask, abort, request, jsonify
+from flask_cors import CORS
 from tempfile import NamedTemporaryFile
 import whisper
 import torch
@@ -14,6 +15,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 model = whisper.load_model("medium", device=DEVICE)
 
 app = Flask(__name__)
+CORS(app, resources={r"/whisper": {"origins": "http://localhost:8001"}})
 
 
 @app.route("/")
@@ -41,12 +43,16 @@ def handler():
         # Let's get the transcript of the temporary file.
         result = model.transcribe(temp.name)
         # Now we can store the result object for this file.
+        no_speech_prob = 1.0
+        if result.get('segments', None):
+            no_speech_prob = min(
+                    [x['no_speech_prob'] for x in result['segments']])
         results.append({
             'filename': filename,
             'transcript': result['text'],
+            'message': 'Transcribed',
+            'no_speech_prob': no_speech_prob,
         })
-
-    # This will be automatically converted to JSON.
-    return {'results': results}
+    return jsonify(results)
 
 

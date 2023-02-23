@@ -5,5 +5,5 @@ docker run \
   --device /dev/nvidia-uvm \
   --device /dev/nvidia-uvm-tools \
   --device /dev/nvidiactl \
-  whisper-api 
-
+  -p 5000:5000 \
+  whisper-api
