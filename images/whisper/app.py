@@ -40,8 +40,19 @@ def handler():
         # Write the user's uploaded file to the temporary file.
         # The file will get deleted when it drops out of scope.
         handle.save(temp)
-        # Let's get the transcript of the temporary file.
-        result = model.transcribe(temp.name)
+
+        try:
+            # Let's get the transcript of the temporary file.
+            result = model.transcribe(temp.name)
+        except RuntimeError as e:
+            results.append({
+                'filename': filename,
+                'transcript': '',
+                'message': 'Transcribed',
+                'no_speech_prob': 1.0,
+            })
+            continue
+
         # Now we can store the result object for this file.
         no_speech_prob = 1.0
         if result.get('segments', None):
