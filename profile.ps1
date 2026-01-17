@@ -19,6 +19,12 @@ write-host Profile Loaded.
 # Must first install with: Install-Module posh-git -Scope CurrentUser
 Import-Module posh-git
 
+# Recommended git configurations
+# For more information, see: https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration
+# - git config --global user.name "John Doe"
+# - git config --global user.email "john.doe@example.com"
+# - git config --global core.editor "cursor --wait"
+
 # Configure vi-style key bindings for PowerShell command line editing
 # This enables vim-like navigation and editing in the PowerShell prompt
 Set-PSReadLineOption -EditMode Vi
