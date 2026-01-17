@@ -119,7 +119,24 @@ function gmt {
     git mergetool --dir-diff $args
 }
 function gcam {
-    git commit -am $args
+    # print the args
+    Write-Host "Args: $args" -ForegroundColor Yellow
+
+    # print the length of the args
+    Write-Host "Length of args: $($args.Length)" -ForegroundColor Yellow
+
+    # if the $args is empty, generate a commit messasge using aichat
+    if ($args.Length -eq 0) {
+        Write-Host "Generating commit message using aichat..." -ForegroundColor Yellow
+        $msg = git diff | aichat write a good git commit message
+        $msg > commit-message.txt
+        git commit -a -F commit-message.txt --edit
+        Remove-Item commit-message.txt
+    } else {
+        Write-Host "Using user-provided commit message..." -ForegroundColor Yellow
+        # Use the user-provided commit message
+        git commit -am $args
+    }
 }
 function glo {
     git log --oneline $args
