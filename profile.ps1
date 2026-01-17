@@ -1,23 +1,32 @@
+# Display a message when the profile is loaded
 write-host Profile Loaded.
-# Powershell profile with convenient paths, shortcuts, etc
 
-# Copy this to suitable location such as:
+# PowerShell profile with convenient paths, shortcuts, and customizations
+# This profile configures vi key bindings, terminal appearance, and useful modules
+
+# Installation Instructions:
+# Copy this file to one of the following locations:
 #   C:\Users\razva\OneDrive\Documents\PowerShell\profile.ps1
 #   C:\Users\razva\OneDrive\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
-#   
-# Or whatever...
+# Or to the appropriate PowerShell profile location for your setup
 
-# Other tools to have installed:
-# aichat, meld, oh-my-posh
+# Prerequisites - Other tools that should be installed:
+# - aichat: AI chat tool
+# - meld: Visual diff and merge tool
+# - oh-my-posh: Prompt theme engine for PowerShell
 
-# Must first install posh-git
+# Import posh-git module for Git integration in PowerShell
+# Must first install with: Install-Module posh-git -Scope CurrentUser
 Import-Module posh-git
 
-# vi key bindings with custom key binding for 'jj' to Escape
+# Configure vi-style key bindings for PowerShell command line editing
+# This enables vim-like navigation and editing in the PowerShell prompt
 Set-PSReadLineOption -EditMode Vi
 Set-PSReadLineOption -ViModeIndicator Script
 
-# Block cursor for insert, bar cursor for comamnd mode
+# Configure cursor appearance based on vi mode:
+# - Insert mode: bar cursor (|) for text insertion
+# - Command mode: block cursor (█) for command navigation
 Set-PSReadLineOption -ViModeChangeHandler {
     param($mode)
 
@@ -28,10 +37,15 @@ Set-PSReadLineOption -ViModeChangeHandler {
     }
 }
 
+# Configure custom key bindings for vi mode:
+# - 'j,*' (j followed by any key): Clear the default handler to allow custom behavior
+# - 'j,j' (double j): Switch from Insert mode to Command mode (acts like Escape)
 Set-PSReadLineKeyHandler -Chord 'j,*' -ScriptBlock {}
 Set-PSReadLineKeyHandler -Chord 'j,j' -ViMode Insert -Function ViCommandMode
 
-# HACK HACK HACK but works -- lets us type 'jk' when jj is bound to vim
+# Workaround to allow typing 'jk' and other 'j' sequences when 'jj' is bound to Escape
+# This handler intercepts 'j' followed by any character (except another 'j') and
+# inserts both characters normally, allowing words like "just" or "json" to be typed
 $letters = 'abcdefghijklmnopqrstuvwxyz'
 $digits  = '0123456789'
 $symbols = '-_=+[]{};:''",.<>/?\|`~!@#$%^&*()'
@@ -46,19 +60,23 @@ foreach ($c in ($letters + $digits + $symbols).ToCharArray()) {
     }
 }
 
+# Add Vim executable directory to PATH for easy access to vim commands
 $env:Path += ";C:\Program Files\Vim\vim91"
+# Alternative: Permanently add to user PATH (uncomment to use):
 # [System.Environment]::SetEnvironmentVariable('Path', $env:Path, [System.EnvironmentVariableTarget]::User)
 
-# Make sure to run this first: oh-my-posh font install 
-# Update Windows Terminal:
-#   1. Open Windows Terminal Settings (Ctrl + ,).
-#   2. Go to Profiles > PowerShell > Appearance.
-#   3. Change Font face to the Nerd Font you just installed (e.g., MesloLGM Nerd Font).#
-
-# Find theme names here: https://ohmyposh.dev/docs/themes 
+# Configure oh-my-posh for custom PowerShell prompt themes
+# Prerequisites:
+#   1. Install oh-my-posh: winget install JanDeDobbeleer.OhMyPosh
+#   2. Install a Nerd Font: oh-my-posh font install
+#   3. Update Windows Terminal font:
+#      - Open Windows Terminal Settings (Ctrl + ,)
+#      - Go to Profiles > PowerShell > Appearance
+#      - Change Font face to the Nerd Font you installed (e.g., MesloLGM Nerd Font)
+# Find available theme names here: https://ohmyposh.dev/docs/themes
 oh-my-posh init pwsh --config "zash" | Invoke-Expression
 
-# Run first:
-#   Install-Module -Name Terminal-Icons -Repository PSGallery
+# Import Terminal-Icons module for file and folder icons in terminal output
+# Install first with: Install-Module -Name Terminal-Icons -Repository PSGallery
 Import-Module -Name Terminal-Icons
 
