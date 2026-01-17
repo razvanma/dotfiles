@@ -2,10 +2,8 @@
 # paths, shortcuts, vi key bindings, terminal appearance, and useful module imports.
 
 # Installation Instructions:
-# Copy this file to one of the following locations:
-#   C:\Users\razva\OneDrive\Documents\PowerShell\profile.ps1
-#   C:\Users\razva\OneDrive\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
-# Or to the appropriate PowerShell profile location for your setup
+# You can run the following to install the profile:
+#   cp profile.ps1 $PROFILE
 
 # Prerequisites - Other developer tools that should be installed first:
 # - aichat: AI chat tool
