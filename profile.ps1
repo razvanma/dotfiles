@@ -7,7 +7,7 @@
 #   C:\Users\razva\OneDrive\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
 # Or to the appropriate PowerShell profile location for your setup
 
-# Prerequisites - Other developer tools that should be installed:
+# Prerequisites - Other developer tools that should be installed first:
 # - aichat: AI chat tool
 # - meld: Visual diff and merge tool
 # - posh-git: Git integration in PowerShell
@@ -119,12 +119,6 @@ function gmt {
     git mergetool --dir-diff $args
 }
 function gcam {
-    # print the args
-    Write-Host "Args: $args" -ForegroundColor Yellow
-
-    # print the length of the args
-    Write-Host "Length of args: $($args.Length)" -ForegroundColor Yellow
-
     # if the $args is empty, generate a commit messasge using aichat
     if ($args.Length -eq 0) {
         Write-Host "Generating commit message using aichat..." -ForegroundColor Yellow
