@@ -24,7 +24,9 @@ Import-Module posh-git
 # - git config --global user.name "John Doe"
 # - git config --global user.email "john.doe@example.com"
 # - git config --global core.editor "cursor --wait"
-#
+# - git config --global diff.tool meld
+# - git config --global merge.tool meld
+# - git config --global difftool.prompt false
 
 # Configure vi-style key bindings for PowerShell command line editing
 # This enables vim-like navigation and editing in the PowerShell prompt
