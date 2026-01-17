@@ -19,6 +19,7 @@
 # - git: Version control system
 # - gh: GitHub CLI
 # - microsoft/inshellisense: IntelliSense for PowerShell
+# - npm: Node.js package manager
 
 # Import posh-git module for Git integration in PowerShell
 # This module provides Git status information directly in the PowerShell prompt.
