@@ -1,8 +1,9 @@
+# This PowerShell profile customizes the shell environment, providing convenient
+# paths, shortcuts, vi key bindings, terminal appearance, and useful module imports.
+
 # Display a message when the profile is loaded
 write-host Profile Loaded.
 
-# PowerShell profile with convenient paths, shortcuts, and customizations
-# This profile configures vi key bindings, terminal appearance, and useful modules
 
 # Installation Instructions:
 # Copy this file to one of the following locations:
@@ -10,12 +11,20 @@ write-host Profile Loaded.
 #   C:\Users\razva\OneDrive\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
 # Or to the appropriate PowerShell profile location for your setup
 
-# Prerequisites - Other tools that should be installed:
+# Prerequisites - Other developer tools that should be installed:
 # - aichat: AI chat tool
 # - meld: Visual diff and merge tool
+# - posh-git: Git integration in PowerShell
+# - Terminal-Icons: File and folder icons in terminal output
 # - oh-my-posh: Prompt theme engine for PowerShell
+# - cursor: Code editor
+# - nodist: Node.js and npm version manager
+# - gemini: AI chat cli
+# - git: Version control system
+# - gh: GitHub CLI
 
 # Import posh-git module for Git integration in PowerShell
+# This module provides Git status information directly in the PowerShell prompt.
 # Must first install with: Install-Module posh-git -Scope CurrentUser
 Import-Module posh-git
 
@@ -89,3 +98,28 @@ oh-my-posh init pwsh --config "zash" | Invoke-Expression
 # Install first with: Install-Module -Name Terminal-Icons -Repository PSGallery
 Import-Module -Name Terminal-Icons
 
+# Define functions for quick git operations.
+function gdt {
+    git difftool --dir-diff $args
+}
+function gmt {
+    git mergetool --dir-diff $args
+}
+function gcam {
+    git commit -am $args
+}
+function glo {
+    git log --oneline $args
+}
+function gco {
+    git checkout $args
+}
+function gd {
+    git diff $args
+}
+function gdf {
+    git diff --stat --name-only $args
+}
+function gca {
+    git commit -a $args
+}
