@@ -1,3 +1,4 @@
+write-host Profile Loaded.
 # Powershell profile with convenient paths, shortcuts, etc
 
 # Copy this to suitable location such as:
@@ -5,6 +6,9 @@
 #   C:\Users\razva\OneDrive\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
 #   
 # Or whatever...
+
+# First install posh-git
+Import-Module posh-git
 
 # vi key bindings with custom key binding for 'jj' to Escape
 Set-PSReadLineOption -EditMode Vi
@@ -41,3 +45,17 @@ foreach ($c in ($letters + $digits + $symbols).ToCharArray()) {
 
 $env:Path += ";C:\Program Files\Vim\vim91"
 # [System.Environment]::SetEnvironmentVariable('Path', $env:Path, [System.EnvironmentVariableTarget]::User)
+
+# Make sure to run this first: oh-my-posh font install 
+# Update Windows Terminal:
+#   1. Open Windows Terminal Settings (Ctrl + ,).
+#   2. Go to Profiles > PowerShell > Appearance.
+#   3. Change Font face to the Nerd Font you just installed (e.g., MesloLGM Nerd Font).#
+
+# Find theme names here: https://ohmyposh.dev/docs/themes 
+oh-my-posh init pwsh --config "zash" | Invoke-Expression
+
+# Run first:
+#   Install-Module -Name Terminal-Icons -Repository PSGallery
+Import-Module -Name Terminal-Icons
+
