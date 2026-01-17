@@ -7,7 +7,10 @@ write-host Profile Loaded.
 #   
 # Or whatever...
 
-# First install posh-git
+# Other tools to have installed:
+# aichat, meld, oh-my-posh
+
+# Must first install posh-git
 Import-Module posh-git
 
 # vi key bindings with custom key binding for 'jj' to Escape
