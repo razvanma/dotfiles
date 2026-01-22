@@ -18,6 +18,19 @@
 # - gh: GitHub CLI
 # - microsoft/inshellisense: IntelliSense for PowerShell
 # - npm: Node.js package manager
+# - windirstat: disk space manager
+
+# If you're developing on Azure:
+# - install azure cli: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
+# - install azure functions core tools (func): https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=windows%2Ccsharp%2Cbash#install-the-azure-functions-core-tools
+# - install azure develeloper CLI (azd):https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview?tabs=windows 
+# - install azure storage emulator: https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite-emulator?tabs=visual-studio
+
+# Bails out early if the session is non-interactive OR if it's the Cursor Agent
+if (-not [Environment]::UserInteractive -or $env:CURSOR_AGENT) {
+    Write-Host "Powershell running in non-interactive mode..."
+    return
+}
 
 # Import posh-git module for Git integration in PowerShell
 # This module provides Git status information directly in the PowerShell prompt.
@@ -146,4 +159,7 @@ function gca {
     git commit -a $args
 }
 
+function vi {
+    gvim $args
+}
 Write-Host "PowerShell profile loaded successfully!" -ForegroundColor Green

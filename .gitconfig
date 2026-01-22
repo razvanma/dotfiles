@@ -1,0 +1,13 @@
+[user]
+	email = raz.mathias@gmail.com
+	name = Raz Mathias
+[diff]
+	tool = meld
+[difftool]
+	prompt = false
+[core]
+	editor = gvim -f
+[merge]
+	tool = meld
+[alias]
+	gdt = difftool --dir-diff
