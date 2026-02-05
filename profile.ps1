@@ -39,11 +39,11 @@ Write-Host "Loading posh-git module..." -ForegroundColor Cyan
 Import-Module posh-git
 
 # Install @microsoft/inshellisense for IntelliSense
-is -s pwsh
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Installing @microsoft/inshellisense..." -ForegroundColor Cyan
-    npm install -g @microsoft/inshellisense
-}
+#is -s pwsh
+#if ($LASTEXITCODE -ne 0) {
+#    Write-Host "Installing @microsoft/inshellisense..." -ForegroundColor Cyan
+#    npm install -g @microsoft/inshellisense
+#}
 
 
 # Recommended git configurations
