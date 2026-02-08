@@ -19,6 +19,7 @@
 # - microsoft/inshellisense: IntelliSense for PowerShell
 # - npm: Node.js package manager
 # - windirstat: disk space manager
+# - jq: pretty-print json (install with winget from https://jqlang.org/download/)
 
 # If you're developing on Azure:
 # - install azure cli: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
@@ -160,6 +161,9 @@ function gdf {
 }
 function gca {
     git commit -a $args
+}
+function write-pr-message {
+    git diff origin/main | aichat write a good git commit message
 }
 
 function vi {
