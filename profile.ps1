@@ -114,7 +114,7 @@ $env:Path += ";C:\Program Files\Vim\vim91"
 #      - Change Font face to the Nerd Font you installed (e.g., MesloLGM Nerd Font)
 # Find available theme names here: https://ohmyposh.dev/docs/themes
 Write-Host "Initializing oh-my-posh with 'zash' theme..." -ForegroundColor Cyan
-oh-my-posh init pwsh --config "zash" | Invoke-Expression
+oh-my-posh init pwsh --config "illusi0n" | Invoke-Expression
 
 # Import Terminal-Icons module for file and folder icons in terminal output
 # Install first with: Install-Module -Name Terminal-Icons -Repository PSGallery
@@ -128,6 +128,9 @@ function gdt {
 }
 function gmt {
     git mergetool --dir-diff $args
+}
+function gb {
+  git branch $args
 }
 function gcam {
     # if the $args is empty, generate a commit messasge using aichat
