@@ -52,8 +52,9 @@ Import-Module posh-git
 # - git config --global user.name "John Doe"
 # - git config --global user.email "john.doe@example.com"
 # - git config --global core.editor "cursor --wait"
-# - git config --global diff.tool meld
-# - git config --global merge.tool meld
+# - git config --global difftool.winmerge.cmd 'winmergeu -e -u -dl "Local" -dr "Remote" "$LOCAL" "$REMOTE"' 
+# - git config --global diff.tool winmerge
+# - git config --global merge.tool winmerge
 # - git config --global difftool.prompt false
 
 # Configure vi-style key bindings for PowerShell command line editing
@@ -114,7 +115,7 @@ $env:Path += ";C:\Program Files\Vim\vim91"
 #      - Go to Profiles > PowerShell > Appearance
 #      - Change Font face to the Nerd Font you installed (e.g., MesloLGM Nerd Font)
 # Find available theme names here: https://ohmyposh.dev/docs/themes
-Write-Host "Initializing oh-my-posh with 'zash' theme..." -ForegroundColor Cyan
+Write-Host "Initializing oh-my-posh with 'illusi0n' theme..." -ForegroundColor Cyan
 oh-my-posh init pwsh --config "illusi0n" | Invoke-Expression
 
 # Import Terminal-Icons module for file and folder icons in terminal output
