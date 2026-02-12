@@ -166,6 +166,10 @@ function gca {
 function write-pr-message {
     git diff origin/main | aichat write a good git commit message
 }
+# HACK HACK
+function psql {
+    C:\Users\razva\AppData\Local\Programs\pgAdmin` 4\runtime\psql.exe --host=localhost --username=postgres $args
+}
 
 function vi {
     gvim $args
