@@ -2,12 +2,17 @@
 	email = raz.mathias@gmail.com
 	name = Raz Mathias
 [diff]
-	tool = meld
+	tool = winmerge
 [difftool]
 	prompt = false
 [core]
 	editor = gvim -f
 [merge]
-	tool = meld
+	tool = C:\\Program Files\\WinMerge\\WinMergeU.exe
 [alias]
 	gdt = difftool --dir-diff
+[difftool "winmerge"]
+	cmd = winmergeu -e -u \"$LOCAL\" \"$REMOTE\"
+[mergetool "winmerge"]
+	cmd = \"C:/Program Files/WinMerge/WinMergeU.exe\" -e -u \"$LOCAL\" \"$REMOTE\"
+
