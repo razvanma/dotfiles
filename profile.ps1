@@ -164,11 +164,15 @@ function gca {
     git commit -a $args
 }
 function write-pr-message {
-    git diff origin/main | aichat write a good git commit message
+    git diff origin/main | aichat 'write a good PR title and comprehensive github PR message. Include code review walk-through instructions (files and what to watch out for, how to test, what has not changed, etc)'
 }
 # HACK HACK
 function psql {
     C:\Users\razva\AppData\Local\Programs\pgAdmin` 4\runtime\psql.exe --host=localhost --username=postgres $args
+}
+
+function hist {
+    Get-Content (Get-PSReadLineOption).HistorySavePath
 }
 
 function vi {
